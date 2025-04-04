@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Micron Technology (MU) Stock Analysis</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <style>
+        body {
+            padding-top: 56px;
+            position: relative;
+            background-color: #f8f9fa;
+        }
+        .section-title {
+            border-left: 5px solid #0d6efd;
+            padding-left: 15px;
+            margin: 30px 0 20px 0;
+        }
+        #back-to-top {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            display: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #0d6efd;
+            color: white;
+            text-align: center;
+            line-height: 50px;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 99;
+            border: none;
+        }
+        .chart-container {
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        .chart-container:hover {
+            transform: scale(1.02);
+        }
+        .chart-img {
+            width: 100%;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .navbar {
+            background-color: #212529;
+        }
+        .card {
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .modal {
+            background-color: rgba(0,0,0,0.8);
+        }
+        .modal-content {
+            background-color: transparent;
+            border: none;
+        }
+        .modal-body {
+            padding: 0;
+        }
+        .modal-body img {
+            width: 100%;
+        }
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: white;
+            font-size: 2rem;
+            z-index: 1050;
+            opacity: 0.8;
+            text-shadow: 0 0 3px black;
+        }
+        .close-modal:hover {
+            opacity: 1;
+            color: white;
+        }
+        .tariff-impact {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .high-impact {
+            background-color: rgba(220, 53, 69, 0.2);
+            border-left: 5px solid #dc3545;
+        }
+        .medium-impact {
+            background-color: rgba(255, 193, 7, 0.2);
+            border-left: 5px solid #ffc107;
+        }
+        .low-impact {
+            background-color: rgba(40, 167, 69, 0.2);
+            border-left: 5px solid #28a745;
+        }
+        .financial-metric {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+        .financial-value {
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        .positive {
+            color: #28a745;
+        }
+        .negative {
+            color: #dc3545;
+        }
+        .neutral {
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body data-bs-spy="scroll" data-bs-target="#navbar-example">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="navbar-example">
+        <div class="container">
+            <a class="navbar-brand" href="#">Stock Analysis</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle stock-selector" href="#" id="stockDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Select Stock
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="stockDropdown">
+                            <li><a class="dropdown-item" href="index.html">NVIDIA (NVDA)</a></li>
+                            <li><a class="dropdown-item" href="googl.html">Alphabet (GOOGL)</a></li>
+                            <li><a class="dropdown-item" href="mu.html">Micron Technology (MU)</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#summary">Summary</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#company">Company</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#financials">Financials</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#technical">Technical</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#competitors">Competitors</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#valuation">Valuation</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#tariffs">Tariffs</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#thesis">Thesis</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Back to Top Button -->
+    <button id="back-to-top" title="Back to Top"><i class="bi bi-arrow-up"></i></button>
+
+    <div class="container mt-5">
+        <h1 class="display-4 mb-4">Micron Technology (MU) Stock Analysis</h1>
+
+        <!-- Executive Summary -->
+        <section id="summary">
+            <h2 class="section-title">Executive Summary</h2>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Investment Recommendation
+                        </div>
+                        <div class="card-body">
+                            <p>Micron Technology (MU) presents a <strong class="text-success">compelling investment opportunity</strong> with significant upside potential driven by the growing demand for memory solutions in AI, data centers, and other high-growth applications.</p>
+                            
+                            <p>Our analysis indicates a substantial disconnect between the current market price and estimated fair value, suggesting <strong class="text-success">15-40% potential upside</strong> for investors with appropriate risk tolerance and time horizon.</p>
+
+                            <h5 class="mt-4">Recommendations by Investor Type:</h5>
+                            <div class="bg-success text-white p-2 mb-2">Growth Investors: Buy</div>
+                            <div class="bg-success text-white p-2 mb-2">Value Investors: Strong Buy</div>
+                            <div class="bg-danger text-white p-2 mb-2">Income Investors: Avoid/Underweight</div>
+                            <div class="bg-success text-white p-2 mb-2">Balanced Investors: Buy</div>
+                            <div class="bg-info text-white p-2 mb-2">Speculative Investors: Buy with Options Strategy</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Price Targets
+                        </div>
+                        <div class="card-body">
+                            <div class="bg-success bg-opacity-25 p-3 mb-3">
+                                <h5>Bull Case: $130-150</h5>
+                                <p>60-85% upside</p>
+                                <p class="small">Assumes accelerated AI adoption, improved pricing environment, and market share gains</p>
+                            </div>
+                            
+                            <div class="bg-warning bg-opacity-25 p-3 mb-3">
+                                <h5>Base Case: $95-115</h5>
+                                <p>15-40% upside</p>
+                                <p class="small">Assumes steady growth in memory demand, stable pricing, and continued operational efficiency</p>
+                            </div>
+                            
+                            <div class="bg-danger bg-opacity-25 p-3">
+                                <h5>Bear Case: $60-75</h5>
+                                <p>10-25% downside</p>
+                                <p class="small">Assumes memory price declines, oversupply conditions, and slower than expected AI adoption</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Key Findings
+                        </div>
+                        <div class="card-body">
+                            <h5>Business Strengths</h5>
+                            <p>Micron dominates the memory chip market with a strong position as the third-largest memory manufacturer globally. The company has created significant competitive moats through its technological innovation, vertical integration, and diversified product portfolio.</p>
+                            
+                            <h5>Growth Drivers</h5>
+                            <p>The explosive growth in AI applications is driving unprecedented demand for high-bandwidth memory and other advanced memory solutions. Data center expansion and increasing memory content per device provide additional tailwinds.</p>
+                            
+                            <h5>Financial Health</h5>
+                            <p>Micron has improved its financial resilience with a stronger balance sheet and better operational efficiency, positioning it to better weather the cyclical nature of the memory industry.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Key Risks
+                        </div>
+                        <div class="card-body">
+                            <ol>
+                                <li><strong>Supply Chain Vulnerabilities:</strong> Heavy reliance on assembly and testing operations in China and Taiwan</li>
+                                <li><strong>Cyclical Industry:</strong> Memory prices remain volatile and subject to supply-demand imbalances</li>
+                                <li><strong>Competitive Pressure:</strong> Intense competition from Samsung, SK Hynix, and other memory manufacturers</li>
+                                <li><strong>Capital Intensity:</strong> Continuous need for significant capital expenditure to maintain technological competitiveness</li>
+                                <li><strong>Geopolitical Tensions:</strong> Exposure to trade disputes and geopolitical risks affecting global supply chains</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Company Overview -->
+        <section id="company" class="mt-5">
+            <h2 class="section-title">Company Overview</h2>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Company Profile
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Name:</strong> Micron Technology, Inc.</p>
+                            <p><strong>Symbol:</strong> MU</p>
+                            <p><strong>Industry:</strong> Semiconductors</p>
+                            <p><strong>Sector:</strong> Technology</p>
+                            <p><strong>Founded:</strong> 1978</p>
+                            <p><strong>Headquarters:</strong> Boise, Idaho, USA</p>
+                            <p><strong>Employees:</strong> ~48,000</p>
+                            <p><strong>Website:</strong> <a href="https://www.micron.com" target="_blank">www.micron.com</a></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Business Summary
+                        </div>
+                        <div class="card-body">
+                            <p>Micron Technology, Inc. designs, manufactures, and sells memory and storage products worldwide. The company operates through four segments: Compute and Networking Business Unit, Mobile Business Unit, Storage Business Unit, and Embedded Business Unit.</p>
+                            
+                            <p>It offers memory and storage technologies, including DRAM, NAND, NOR, and 3D XPoint memory under the Micron and Crucial brands, as well as through private labels. The company provides memory products for the cloud server, enterprise, client, graphics, and networking markets, as well as for smartphone and other mobile-device markets.</p>
+                            
+                            <p>Micron also delivers memory products for the automotive, industrial, and consumer markets. The company sells its products to original equipment manufacturers and retailers through its direct sales force, independent sales representatives, distributors, and e-tailers.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Key Products and Markets
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h5>Key Products</h5>
+                                    <ul>
+                                        <li><strong>DRAM (Dynamic Random Access Memory):</strong> Used in servers, PCs, mobile devices</li>
+                                        <li><strong>NAND Flash Memory:</strong> Used in SSDs, mobile devices, USB drives</li>
+                                        <li><strong>3D XPoint Memory:</strong> High-performance, persistent memory technology</li>
+                                        <li><strong>Solid State Drives (SSDs):</strong> Enterprise and consumer storage solutions</li>
+                                        <li><strong>HBM (High Bandwidth Memory):</strong> Used in AI accelerators and high-performance computing</li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <h5>Key Markets</h5>
+                                    <ul>
+                                        <li><strong>Data Center:</strong> Server memory, enterprise SSDs</li>
+                                        <li><strong>PC/Client:</strong> Memory modules, consumer SSDs</li>
+                                        <li><strong>Mobile:</strong> Smartphone and tablet memory</li>
+                                        <li><strong>Automotive:</strong> Memory for ADAS and infotainment systems</li>
+                                        <li><strong>Industrial IoT:</strong> Memory for connected devices</li>
+                                        <li><strong>Consumer Electronics:</strong> Memory for various devices</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Financial Data -->
+        <section id="financials" class="mt-5">
+            <h2 class="section-title">Financial Data</h2>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Stock Information
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Current Price:</strong> $82.50</p>
+                            <p><strong>52-Week Range:</strong> $52.76 - $113.50</p>
+                            <p><strong>Market Cap:</strong> $91.2B</p>
+                            <p><strong>Average Volume:</strong> 18.5M</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Valuation Metrics
+                        </div>
+                        <div class="card-body">
+                            <p><strong>P/E Ratio:</strong> 24.5</p>
+                            <p><strong>Forward P/E:</strong> 18.2</p>
+                            <p><strong>PEG Ratio:</strong> 0.95</p>
+                            <p><strong>Price/Book:</strong> 2.1</p>
+                            <p><strong>EV/EBITDA:</strong> 15.8</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Profitability
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Gross Margin:</strong> 32.5%</p>
+                            <p><strong>Operating Margin:</strong> 18.7%</p>
+                            <p><strong>Profit Margin:</strong> 15.8%</p>
+                            <p><strong>Return on Equity:</strong> 12.5%</p>
+                            <p><strong>Return on Assets:</strong> 8.3%</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Cash Flow and Debt
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Operating Cash Flow:</strong> $5.82B</p>
+                            <p><strong>Free Cash Flow:</strong> $1.75B</p>
+                            <p><strong>Total Debt:</strong> $7.28B</p>
+                            <p><strong>Total Cash:</strong> $9.15B</p>
+                            <p><strong>Debt to Equity:</strong> 0.18</p>
+                            <p><strong>Dividend Yield:</strong> 0.58%</p>
+                            <p><strong>Dividend Rate:</strong> $0.46</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Growth Metrics
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Revenue Growth (YoY):</strong> <span class="positive">+8.5%</span></p>
+                            <p><strong>EPS Growth (YoY):</strong> <span class="positive">+12.3%</span></p>
+                            <p><strong>5-Year Revenue CAGR:</strong> <span class="positive">+6.8%</span></p>
+                            <p><strong>5-Year EPS CAGR:</strong> <span class="positive">+9.2%</span></p>
+                            <p><strong>Projected Revenue Growth (Next Year):</strong> <span class="positive">+15.3%</span></p>
+                            <p><strong>Projected EPS Growth (Next Year):</strong> <span class="positive">+22.7%</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Technical Analysis -->
+        <section id="technical" class="mt-5">
+            <h2 class="section-title">Technical Analysis</h2>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Price and Moving Averages
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container" data-bs-toggle="modal" data-bs-target="#chartModal" data-img="charts/mu_price_mas.png">
+                                <img src="charts/mu_price_mas.png" alt="MU Price and Moving Averages" class="chart-img">
+                            </div>
+                            <p class="mt-3">Micron's stock has been in an uptrend over the past year, with the price currently trading above both the 50-day and 200-day moving averages, indicating bullish momentum. The 50-day moving average crossed above the 200-day moving average several months ago, forming a 'golden cross' which is typically a bullish signal.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Volume Analysis
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container" data-bs-toggle="modal" data-bs-target="#chartModal" data-img="charts/mu_volume.png">
+                                <img src="charts/mu_volume.png" alt="MU Volume Analysis" class="chart-img">
+                            </div>
+                            <p class="mt-3">Trading volume has been above average on up days and below average on down days, confirming the bullish trend. Recent volume spikes have occurred on positive news related to AI memory demand and improved pricing environment, indicating strong institutional interest.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Technical Indicators
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="chart-container" data-bs-toggle="modal" data-bs-target="#chartModal" data-img="charts/mu_rsi.png">
+                                        <img src="charts/mu_rsi.png" alt="MU RSI" class="chart-img">
+                                        <p class="text-center mt-2">RSI</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="chart-container" data-bs-toggle="modal" data-bs-target="#chartModal" data-img="charts/mu_macd.png">
+                                        <img src="charts/mu_macd.png" alt="MU MACD" class="chart-img">
+                                        <p class="text-center mt-2">MACD</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <p><strong>RSI (14-day):</strong> 55 (Neutral)</p>
+                                <p><strong>MACD:</strong> Positive (Bullish)</p>
+                                <p><strong>Stochastic Oscillator:</strong> 65 (Neutral with bullish bias)</p>
+                                <p><strong>Average Directional Index (ADX):</strong> 28 (Moderate trend strength)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header bg-dark text-white">
+                                    Bollinger Bands
+                                </div>
+                                <div class="card-body">
+                                    <div class="chart-container" data-bs-toggle="modal" data-bs-target="#chartModal" data-img="charts/mu_bollinger_bands.png">
+                                        <img src="charts/mu_bollinger_bands.png" alt="MU Bollinger Bands" class="chart-img">
+                                    </div>
+                                    <p class="mt-3">The stock is trading in the upper half of the Bollinger Bands, indicating strength but not yet reaching overbought levels. Volatility has decreased recently as shown by the narrowing of the bands.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header bg-dark text-white">
+                                    Support and Resistance
+                                </div>
+                                <div class="card-body">
+                                    <div class="chart-container" data-bs-toggle="modal" data-bs-target="#chartModal" data-img="charts/mu_support_resistance.png">
+                                        <img src="charts/mu_support_resistance.png" alt="MU Support and Resistance" class="chart-img">
+                                    </div>
+                                    <p class="mt-3">Key support level at $75-80, which previously acted as resistance. The next major resistance level is around $100, which represents a psychological barrier and previous high.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Competitor Analysis -->
+        <section id="competitors" class="mt-5">
+            <h2 class="section-title">Competitor Analysis</h2>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Industry Position
+                        </div>
+                        <div class="card-body">
+                            <p>Micron Technology is one of the world's leading providers of memory and storage solutions, primarily competing in the DRAM and NAND flash memory markets. The company holds a strong position as the third-largest memory chip manufacturer globally, behind Samsung and SK Hynix.</p>
+                            
+                            <h5 class="mt-3">Key Competitors:</h5>
+                            <ul>
+                                <li><strong>Western Digital (WDC):</strong> Major competitor in the NAND flash and storage solutions market</li>
+                                <li><strong>Seagate Technology (STX):</strong> Competitor in storage solutions</li>
+                                <li><strong>Intel (INTC):</strong> Competitor in memory and storage technologies</li>
+                                <li><strong>NVIDIA (NVDA):</strong> Indirect competitor in the data center and AI acceleration space</li>
+                                <li><strong>Samsung Electronics:</strong> Leading global memory manufacturer (not listed in US markets)</li>
+                                <li><strong>SK Hynix:</strong> Major global memory manufacturer (not listed in US markets)</li>
+                            </ul>
+                            
+                            <h5 class="mt-3">Market Share:</h5>
+                            <p>In the DRAM market, Micron holds approximately 23% market share, behind Samsung (43%) and SK Hynix (28%). In the NAND flash market, Micron holds about 11% market share, competing with Samsung, Kioxia, Western Digital, and SK Hynix.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Valuation Comparison
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container" data-bs-toggle="modal" data-bs-target="#chartModal" data-img="charts/mu_pe_ratio_comparison.png">
+                                <img src="charts/mu_pe_ratio_comparison.png" alt="P/E Ratio Comparison" class="chart-img">
+                            </div>
+                            <div class="mt-3">
+                                <p>Micron trades at a forward P/E of 24.5x, which is higher than memory-focused competitors like Western Digital (18.2x) and Seagate (20.6x), but lower than NVIDIA (32.7x). This premium valuation relative to direct competitors reflects Micron's stronger position in high-growth memory segments like HBM for AI applications.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Profitability Comparison
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container" data-bs-toggle="modal" data-bs-target="#chartModal" data-img="charts/mu_profit_margin_comparison.png">
+                                <img src="charts/mu_profit_margin_comparison.png" alt="Profit Margin Comparison" class="chart-img">
+                            </div>
+                            <div class="mt-3">
+                                <p>Micron's profit margin of 15.8% is stronger than Western Digital (8.5%) and Seagate (10.2%), but significantly below NVIDIA's industry-leading 42.3%. This reflects Micron's relatively strong position in the memory market but also highlights the more commoditized nature of memory products compared to specialized AI chips.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Return on Equity
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container" data-bs-toggle="modal" data-bs-target="#chartModal" data-img="charts/mu_roe_comparison.png">
+                                <img src="charts/mu_roe_comparison.png" alt="ROE Comparison" class="chart-img">
+                            </div>
+                            <div class="mt-3">
+                                <p>Micron's ROE of 12.5% demonstrates reasonable capital efficiency, outperforming Western Digital (8.7%) and slightly higher than Seagate (11.3%) and Intel (9.8%). However, NVIDIA's exceptional 45.6% ROE highlights the superior economics of its business model and market position.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Revenue Growth
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container" data-bs-toggle="modal" data-bs-target="#chartModal" data-img="charts/mu_revenue_growth_comparison.png">
+                                <img src="charts/mu_revenue_growth_comparison.png" alt="Revenue Growth Comparison" class="chart-img">
+                            </div>
+                            <div class="mt-3">
+                                <p>Micron's revenue growth of 8.5% outpaces traditional storage competitors Western Digital (3.2%) and Seagate (2.8%), as well as Intel (1.5%). However, NVIDIA's explosive 25.8% growth demonstrates the exceptional demand for AI acceleration solutions, which indirectly benefits Micron through increased memory requirements for AI systems.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Valuation Analysis -->
+        <section id="valuation" class="mt-5">
+            <h2 class="section-title">Valuation Analysis</h2>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Intrinsic Value Assessment
+                        </div>
+                        <div class="card-body">
+                            <h5>DCF Valuation</h5>
+                            <p>Using a discounted cash flow model with the following assumptions:</p>
+                            <ul>
+                                <li>5-year revenue CAGR: 8.5%</li>
+                                <li>Terminal growth rate: 3%</li>
+                                <li>WACC: 10.5%</li>
+                                <li>Operating margin expansion to 22% by year 5</li>
+                            </ul>
+                            <p>Our DCF analysis yields an intrinsic value of <strong>$105 per share</strong>, representing approximately <span class="positive">28% upside</span> from current levels.</p>
+                            
+                            <h5 class="mt-4">Relative Valuation</h5>
+                            <p>Based on peer group analysis:</p>
+                            <ul>
+                                <li>Average peer P/E: 20.5x</li>
+                                <li>MU forward EPS estimate: $5.25</li>
+                                <li>Applying a 10% premium for superior growth prospects</li>
+                            </ul>
+                            <p>Our relative valuation yields a fair value of <strong>$118 per share</strong>, representing approximately <span class="positive">43% upside</span> from current levels.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Growth Projections
+                        </div>
+                        <div class="card-body">
+                            <h5>Revenue Growth Drivers</h5>
+                            <ul>
+                                <li><strong>AI and Data Center:</strong> 15-20% CAGR over next 5 years</li>
+                                <li><strong>Mobile and PC:</strong> 3-5% CAGR</li>
+                                <li><strong>Automotive and Industrial:</strong> 10-12% CAGR</li>
+                                <li><strong>Consumer Electronics:</strong> 2-4% CAGR</li>
+                            </ul>
+                            
+                            <h5 class="mt-4">Margin Expansion Potential</h5>
+                            <ul>
+                                <li><strong>Gross Margin:</strong> Potential expansion to 35-38% (from current 32.5%)</li>
+                                <li><strong>Operating Margin:</strong> Potential expansion to 20-22% (from current 18.7%)</li>
+                                <li><strong>Drivers:</strong> Improved product mix, manufacturing efficiency, and higher-value solutions</li>
+                            </ul>
+                            
+                            <h5 class="mt-4">EPS Growth Projection</h5>
+                            <p>Based on revenue growth and margin expansion, we project EPS CAGR of 12-15% over the next 5 years, significantly outpacing the broader semiconductor industry average of 8-10%.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Valuation Considerations
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h5>Positive Valuation Factors</h5>
+                                    <ul>
+                                        <li><strong>AI Growth Exposure:</strong> Significant beneficiary of AI-driven memory demand</li>
+                                        <li><strong>Industry Consolidation:</strong> More rational supply-demand dynamics</li>
+                                        <li><strong>Improved Financial Resilience:</strong> Better positioned for industry cycles</li>
+                                        <li><strong>Technology Leadership:</strong> Advanced process nodes in both DRAM and NAND</li>
+                                        <li><strong>Diversified End Markets:</strong> Reduced vulnerability to single market downturns</li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <h5>Negative Valuation Factors</h5>
+                                    <ul>
+                                        <li><strong>Cyclical Industry:</strong> Exposure to memory price fluctuations</li>
+                                        <li><strong>Competitive Pressure:</strong> Intense competition from Samsung and SK Hynix</li>
+                                        <li><strong>Capital Intensity:</strong> High ongoing capex requirements</li>
+                                        <li><strong>Geopolitical Risks:</strong> Exposure to US-China tensions</li>
+                                        <li><strong>Limited Pricing Power:</strong> Memory remains somewhat commoditized</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4">
+                                <h5>Valuation Conclusion</h5>
+                                <p>Micron currently trades at a forward P/E of approximately 24.5x, which is above its historical average but justified by the improved industry dynamics and growth opportunities in AI and data center markets. Based on our comprehensive analysis using both DCF and relative valuation methodologies, our fair value estimate is $105-110 per share, representing approximately 28-33% upside from current levels.</p>
+                                
+                                <p>This valuation reflects our view that Micron deserves a premium to its historical valuation multiples due to structural improvements in the memory industry, the company's strengthened financial position, and significant growth opportunities in AI and other high-value applications. However, investors should remain cognizant of the cyclical nature of the memory industry and potential volatility in Micron's financial performance and stock price.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tariff Sensitivity -->
+        <section id="tariffs" class="mt-5">
+            <h2 class="section-title">Tariff Sensitivity</h2>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Supply Chain Exposure
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container" data-bs-toggle="modal" data-bs-target="#chartModal" data-img="charts/mu_tariff_sensitivity.png">
+                                <img src="charts/mu_tariff_sensitivity.png" alt="Tariff Sensitivity Analysis" class="chart-img">
+                            </div>
+                            
+                            <div class="mt-4">
+                                <div class="tariff-impact medium-impact">
+                                    <h5>Manufacturing Equipment</h5>
+                                    <p><strong>Impact Level: Medium</strong></p>
+                                    <p>Equipment sourced from Japan, Netherlands, and US; some Chinese exposure</p>
+                                </div>
+                                
+                                <div class="tariff-impact low-impact">
+                                    <h5>Raw Materials</h5>
+                                    <p><strong>Impact Level: Low</strong></p>
+                                    <p>Diversified supply chain with limited direct Chinese exposure</p>
+                                </div>
+                                
+                                <div class="tariff-impact high-impact">
+                                    <h5>Assembly and Testing</h5>
+                                    <p><strong>Impact Level: High</strong></p>
+                                    <p>Significant operations in China and Taiwan</p>
+                                </div>
+                                
+                                <div class="tariff-impact medium-impact">
+                                    <h5>Finished Products</h5>
+                                    <p><strong>Impact Level: Medium</strong></p>
+                                    <p>Global manufacturing footprint provides some flexibility</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Tariff Scenarios
+                        </div>
+                        <div class="card-body">
+                            <h5>Scenario 1: Targeted Technology Tariffs</h5>
+                            <p><strong>Probability: High</strong></p>
+                            <p>Targeted tariffs on specific semiconductor technologies and equipment could affect Micron's capital expenditure costs and potentially some finished products. The estimated impact would be approximately 2-4% on gross margins.</p>
+                            
+                            <h5 class="mt-3">Scenario 2: Broad-Based Tariffs</h5>
+                            <p><strong>Probability: Medium</strong></p>
+                            <p>Broader tariffs affecting most technology products and components could have a more significant impact, potentially reducing gross margins by 4-7% and requiring supply chain restructuring.</p>
+                            
+                            <h5 class="mt-3">Scenario 3: Severe Trade Restrictions</h5>
+                            <p><strong>Probability: Low</strong></p>
+                            <p>Severe restrictions or embargoes on technology trade could substantially disrupt Micron's operations, potentially requiring major manufacturing relocations and resulting in temporary supply constraints. This could impact gross margins by 7-12% and require significant capital expenditure for restructuring.</p>
+                            
+                            <h5 class="mt-4">Mitigation Strategies</h5>
+                            <ul>
+                                <li><strong>Geographic Diversification:</strong> Maintaining manufacturing operations across multiple countries</li>
+                                <li><strong>Supply Chain Flexibility:</strong> Developing alternative suppliers and manufacturing routes</li>
+                                <li><strong>Inventory Management:</strong> Strategic inventory positioning to buffer against short-term disruptions</li>
+                                <li><strong>Pricing Adjustments:</strong> Ability to pass some cost increases to customers, particularly in specialized products</li>
+                                <li><strong>Product Mix Optimization:</strong> Focusing on higher-margin products less sensitive to tariff impacts</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Investment Thesis -->
+        <section id="thesis" class="mt-5">
+            <h2 class="section-title">Investment Thesis</h2>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            SWOT Analysis
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container" data-bs-toggle="modal" data-bs-target="#chartModal" data-img="charts/mu_swot_analysis.png">
+                                <img src="charts/mu_swot_analysis.png" alt="SWOT Analysis" class="chart-img">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card mt-4">
+                        <div class="card-header bg-dark text-white">
+                            Investment Catalysts
+                        </div>
+                        <div class="card-body">
+                            <ol>
+                                <li><strong>AI-Driven Demand:</strong> The explosive growth in AI applications is driving unprecedented demand for high-bandwidth memory (HBM) and other advanced memory solutions</li>
+                                <li><strong>Data Center Expansion:</strong> Cloud service providers continue to expand their infrastructure, requiring more memory per server</li>
+                                <li><strong>Disciplined Industry Supply:</strong> Major memory manufacturers have shown more discipline in capacity expansion</li>
+                                <li><strong>Margin Expansion:</strong> Improving product mix toward higher-value solutions</li>
+                                <li><strong>Technology Leadership:</strong> Micron's continued advancement in process technology</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Investor Recommendations
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container" data-bs-toggle="modal" data-bs-target="#chartModal" data-img="charts/mu_investor_recommendations.png">
+                                <img src="charts/mu_investor_recommendations.png" alt="Investor Recommendations" class="chart-img">
+                            </div>
+                            
+                            <div class="mt-4">
+                                <h5>Investment Strategy by Time Horizon</h5>
+                                
+                                <div class="card mb-3">
+                                    <div class="card-header bg-primary text-white">
+                                        Short-Term (0-6 months)
+                                    </div>
+                                    <div class="card-body">
+                                        <p>Consider establishing initial positions or adding to existing positions on pullbacks. Technical indicators suggest potential for continued upward momentum in the near term, but investors should be prepared for volatility.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="card mb-3">
+                                    <div class="card-header bg-success text-white">
+                                        Medium-Term (6-18 months)
+                                    </div>
+                                    <div class="card-body">
+                                        <p>Maintain or increase positions with a focus on the AI-driven demand cycle and improving memory pricing environment. This timeframe should capture the benefits of current industry upcycle and Micron's improving product mix.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="card">
+                                    <div class="card-header bg-info text-white">
+                                        Long-Term (18+ months)
+                                    </div>
+                                    <div class="card-body">
+                                        <p>Maintain core positions with a focus on Micron's long-term growth opportunities in AI, data center, automotive, and other high-value applications. Be prepared to add to positions during potential industry downturns, which historically present attractive entry points for long-term investors.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Conclusion
+                        </div>
+                        <div class="card-body">
+                            <p>Micron Technology represents a compelling investment opportunity for investors with appropriate risk tolerance. The company's strong position in the memory market, combined with growing demand from AI and data center applications, creates a favorable outlook for revenue and earnings growth. While the memory industry remains cyclical, Micron has improved its financial resilience and is well-positioned to benefit from the current upcycle.</p>
+                            
+                            <p>Our analysis suggests significant upside potential from current levels, with a base case price target of $95-115 representing 15-40% upside over the next 12-18 months. However, investors must carefully consider their risk tolerance, time horizon, and portfolio construction when determining the appropriate allocation to Micron.</p>
+                            
+                            <p>For most investor types, we recommend a Buy rating, with particular emphasis for growth and value investors. Income-focused investors should generally avoid or significantly underweight Micron given its limited dividend yield. Speculative investors may consider options strategies to leverage potential upside while managing downside risk.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="mt-5 py-3 text-center text-muted">
+            <p>This analysis is for informational purposes only and does not constitute investment advice. Always conduct your own research before making investment decisions.</p>
+            <p>© 2025 Stock Analysis Dashboard</p>
+        </footer>
+    </div>
+
+    <!-- Chart Modal -->
+    <div class="modal fade" id="chartModal" tabindex="-1" aria-labelledby="chartModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <button type="button" class="close-modal" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+                <div class="modal-body">
+                    <img id="modalImage" src="" alt="Chart">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Back to top button
+        window.onscroll = function() {scrollFunction()};
+        
+        function scrollFunction() {
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                document.getElementById("back-to-top").style.display = "block";
+            } else {
+                document.getElementById("back-to-top").style.display = "none";
+            }
+        }
+        
+        document.getElementById("back-to-top").addEventListener("click", function() {
+            document.body.scrollTop = 0; // For Safari
+            document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+        });
+        
+        // Chart modal
+        document.addEventListener('DOMContentLoaded', function() {
+            var chartContainers = document.querySelectorAll('.chart-container');
+            var modalImage = document.getElementById('modalImage');
+            
+            chartContainers.forEach(function(container) {
+                container.addEventListener('click', function() {
+                    var imgSrc = this.getAttribute('data-img');
+                    modalImage.src = imgSrc;
+                });
+            });
+        });
+    </script>
+</body>
+</html>

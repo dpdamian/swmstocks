@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Analysis Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            padding-top: 56px;
+        }
+        .navbar {
+            box-shadow: 0 2px 4px rgba(0,0,0,.1);
+        }
+        .section-title {
+            border-left: 4px solid #28a745;
+            padding-left: 10px;
+            margin: 30px 0 20px 0;
+        }
+        .card {
+            box-shadow: 0 4px 6px rgba(0,0,0,.1);
+            margin-bottom: 20px;
+            border: none;
+        }
+        .card-header {
+            font-weight: 600;
+        }
+        .recommendation-card {
+            border-left: 5px solid;
+            transition: transform 0.3s;
+        }
+        .recommendation-card:hover {
+            transform: translateY(-5px);
+        }
+        .strong-buy {
+            border-left-color: #28a745;
+        }
+        .buy {
+            border-left-color: #5cb85c;
+        }
+        .hold {
+            border-left-color: #f0ad4e;
+        }
+        .avoid {
+            border-left-color: #d9534f;
+        }
+        .price-target {
+            border-left: 5px solid;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .bull-case {
+            border-left-color: #28a745;
+            background-color: rgba(40, 167, 69, 0.1);
+        }
+        .base-case {
+            border-left-color: #f0ad4e;
+            background-color: rgba(240, 173, 78, 0.1);
+        }
+        .bear-case {
+            border-left-color: #d9534f;
+            background-color: rgba(217, 83, 79, 0.1);
+        }
+        .chart-container {
+            cursor: pointer;
+            transition: transform 0.3s;
+            margin-bottom: 20px;
+        }
+        .chart-container:hover {
+            transform: scale(1.02);
+        }
+        .chart-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,.1);
+        }
+        .modal-body img {
+            max-width: 100%;
+        }
+        .key-finding {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+        .key-risk {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            background-color: #f8d7da;
+        }
+        .stock-selector {
+            min-width: 150px;
+        }
+        #stockDropdown {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">Stock Analysis</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle stock-selector" href="#" id="stockDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Select Stock
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="stockDropdown">
+                            <li><a class="dropdown-item" href="index.html">NVIDIA (NVDA)</a></li>
+                            <li><a class="dropdown-item" href="googl.html">Alphabet (GOOGL)</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#summary">Summary</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#company">Company</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#financials">Financials</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#technical">Technical</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#competitors">Competitors</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#valuation">Valuation</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#thesis">Thesis</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h1 class="display-4 mb-4">Alphabet Inc. (GOOGL) Stock Analysis</h1>
+
+        <div id="summary" class="mb-5">
+            <h2 class="section-title">Executive Summary</h2>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Investment Recommendation
+                        </div>
+                        <div class="card-body">
+                            <p>Alphabet Inc. (GOOGL) presents a compelling investment opportunity with its dominant market position in digital advertising, search, and growing cloud business. The company offers a balanced mix of value and growth potential with strong profit margins and significant cash reserves, positioning it well to weather economic uncertainties while investing in future growth areas like artificial intelligence, cloud computing, and other moonshot projects.</p>
+                            <p>Our analysis indicates a substantial disconnect between the current market price ($150.72) and estimated fair value, suggesting potential upside for investors with appropriate risk tolerance and time horizon.</p>
+                            
+                            <h5 class="mt-4">Recommendations by Investor Type:</h5>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <div class="card recommendation-card buy">
+                                        <div class="card-body">
+                                            <h6 class="card-title">Growth Investors: Buy</h6>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="card recommendation-card buy">
+                                        <div class="card-body">
+                                            <h6 class="card-title">Value Investors: Buy</h6>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="card recommendation-card avoid">
+                                        <div class="card-body">
+                                            <h6 class="card-title">Income Investors: Avoid/Hold</h6>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="card recommendation-card buy">
+                                        <div class="card-body">
+                                            <h6 class="card-title">Balanced Investors: Buy</h6>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Price Targets
+                        </div>
+                        <div class="card-body">
+                            <div class="price-target bull-case">
+                                <h5>Bull Case: $210-230</h5>
+                                <p>40-53% upside</p>
+                                <small>Assumes accelerated growth in Google Cloud Platform, continued strong performance in advertising business, successful monetization of AI technologies, and favorable resolution of regulatory challenges.</small>
+                            </div>
+                            
+                            <div class="price-target base-case">
+                                <h5>Base Case: $180-200</h5>
+                                <p>19-33% upside</p>
+                                <small>Assumes steady growth in core advertising business, continued progress in cloud market share, gradual improvement in YouTube revenues, and some regulatory headwinds but no major adverse rulings.</small>
+                            </div>
+                            
+                            <div class="price-target bear-case">
+                                <h5>Bear Case: $140-160</h5>
+                                <p>7% downside to 6% upside</p>
+                                <small>Assumes slowdown in digital advertising market, increased competition, adverse regulatory decisions, slower than expected growth in cloud and new initiatives, and multiple compression.</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Key Findings
+                        </div>
+                        <div class="card-body">
+                            <div class="key-finding">
+                                <strong>Search Market Dominance:</strong> Google maintains approximately 90% of the global search market share
+                            </div>
+                            <div class="key-finding">
+                                <strong>Advertising Revenue Engine:</strong> Highly effective digital advertising platform generating consistent cash flow
+                            </div>
+                            <div class="key-finding">
+                                <strong>Financial Stability:</strong> Strong balance sheet with significant cash reserves and low debt
+                            </div>
+                            <div class="key-finding">
+                                <strong>Diverse Revenue Streams:</strong> Growing diversification beyond advertising with Cloud, YouTube, and hardware
+                            </div>
+                            <div class="key-finding">
+                                <strong>AI/ML Leadership:</strong> Cutting-edge research and implementation of artificial intelligence technologies
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Key Risks
+                        </div>
+                        <div class="card-body">
+                            <div class="key-risk">
+                                <strong>Regulatory Scrutiny:</strong> Facing antitrust investigations in multiple jurisdictions
+                            </div>
+                            <div class="key-risk">
+                                <strong>Privacy Concerns:</strong> Increasing pressure on data collection and privacy practices
+                            </div>
+                            <div class="key-risk">
+                                <strong>Cloud Market Position:</strong> Currently third in cloud market behind AWS and Azure
+                            </div>
+                            <div class="key-risk">
+                                <strong>Revenue Concentration:</strong> Still heavily dependent on advertising revenue
+                            </div>
+                            <div class="key-risk">
+                                <strong>Economic Sensitivity:</strong> Advertising revenue vulnerable to economic downturns
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="company" class="mb-5">
+            <h2 class="section-title">Company Overview</h2>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Company Profile
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Company Name:</strong> Alphabet Inc.</p>
+                            <p><strong>Symbol:</strong> GOOGL</p>
+                            <p><strong>Address:</strong> 1600 Amphitheatre Parkway, Mountain View, 94043, United States</p>
+                            <p><strong>Phone:</strong> 650-253-0000</p>
+                            <p><strong>Website:</strong> <a href="https://abc.xyz" target="_blank">https://abc.xyz</a></p>
+                            <p><strong>Industry:</strong> Internet Content & Information</p>
+                            <p><strong>Sector:</strong> Communication Services</p>
+                            <p><strong>Full-Time Employees:</strong> 183,323</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Current Stock Information
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Current Price:</strong> $150.72</p>
+                            <p><strong>Previous Close:</strong> $154.92</p>
+                            <p><strong>Day Range:</strong> $150.39 - $152.78</p>
+                            <p><strong>52-Week Range:</strong> $147.22 - $207.05</p>
+                            <p><strong>Volume:</strong> 45,935,694</p>
+                            <p><strong>Analyst Target Price:</strong> $220.00</p>
+                            <p><strong>Analyst Rating:</strong> BUY</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-header bg-dark text-white">
+                    Business Summary
+                </div>
+                <div class="card-body">
+                    <p>Alphabet Inc. offers various products and platforms in the United States, Europe, the Middle East, Africa, the Asia-Pacific, Canada, and Latin America. It operates through Google Services, Google Cloud, and Other Bets segments. The Google Services segment provides products and services, including ads, Android, Chrome, devices, Gmail, Google Drive, Google Maps, Google Photos, Google Play, Search, and YouTube. It is also involved in the sale of apps and in-app purchases and digital content in the Google Play and YouTube; and devices, as well as in the provision of YouTube consumer subscription services. The Google Cloud segment offers AI infrastructure, Vertex AI platform, cybersecurity, data and analytics, and other services; Google Workspace that include cloud-based communication and collaboration tools for enterprises, such as Calendar, Gmail, Docs, Drive, and Meet; and other services for enterprise customers. The Other Bets segment sells healthcare-related and internet services. The company was incorporated in 1998 and is headquartered in Mountain View, California.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="financials" class="mb-5">
+            <h2 class="section-title">Financial Data</h2>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Key Financial Metrics
+                        </div>
+                        <div class="card-body">
+                            <p><strong>50-Day Moving Average:</strong> $176.50</p>
+                            <p><strong>200-Day Moving Average:</strong> $174.51</p>
+                            <p><strong>RSI (14-day):</strong> 32.50</p>
+                            <p><strong>Support Level:</strong> $136.57</p>
+                            <p><strong>Resistance Level:</strong> $163.86</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card mt-4">
+                        <div class="card-header bg-dark text-white">
+                            Profitability
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Profit Margin:</strong> N/A</p>
+                            <p><strong>Operating Margin:</strong> N/A</p>
+                            <p><strong>Return on Equity:</strong> N/A</p>
+                            <p><strong>Return on Assets:</strong> N/A</p>
+                        </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Valuation Metrics
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Market Cap:</strong> N/A</p>
+                            <p><strong>P/E Ratio:</strong> N/A</p>
+                            <p><strong>PEG Ratio:</strong> N/A</p>
+                            <p><strong>Price to Book:</strong> N/A</p>
+                            <p><strong>Beta:</strong> N/A</p>
+                        </div>
+                    
+                    <div class="card mt-4">
+                        <div class="card-header bg-dark text-white">
+                            Cash Flow and Debt
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Operating Cash Flow:</strong> N/A</p>
+                            <p><strong>Free Cash Flow:</strong> N/A</p>
+                            <p><strong>Debt to Equity:</strong> N/A</p>
+                            <p><strong>Dividend Yield:</strong> N/A</p>
+                            <p><strong>Dividend Rate:</strong> N/A</p>
+                            <p><strong>Payout Ratio:</strong> N/A</p>
+                        </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="technical" class="mb-5">
+            <h2 class="section-title">Technical Analysis</h2>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Technical Outlook
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Short-Term Outlook:</strong> Strong Bearish Evidence (Direction: Bearish)</p>
+                            <p><strong>Intermediate-Term Outlook:</strong> Strong Bearish Evidence (Direction: Bearish)</p>
+                            <p><strong>Long-Term Outlook:</strong> Bearish Evidence (Direction: Bearish)</p>
+                            <p><strong>Valuation Assessment:</strong> Near Fair Value</p>
+                            <p><strong>Discount/Premium:</strong> 14%</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Technical Indicators
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Current Price vs 50-Day MA:</strong> -14.6% (Bearish)</p>
+                            <p><strong>Current Price vs 200-Day MA:</strong> -13.6% (Bearish)</p>
+                            <p><strong>RSI (14-day):</strong> 32.50 (Approaching Oversold)</p>
+                            <p><strong>Support Level:</strong> $136.57</p>
+                            <p><strong>Resistance Level:</strong> $163.86</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <h5>Price and Moving Averages</h5>
+                    <div class="chart-container" data-bs-toggle="modal" data-bs-target="#chartModal" data-title="GOOGL Price and Moving Averages" data-img="charts/googl_price_mas.png">
+                        <img src="charts/googl_price_mas.png" alt="GOOGL Price and Moving Averages" class="img-fluid">
+                    </div>
+                    
+                    <h5>MACD</h5>
+                    <div class="chart-container" data-bs-toggle="modal" data-bs-target="#chartModal" data-title="GOOGL MACD" data-img="charts/googl_macd.png">
+                        <img src="charts/googl_macd.png" alt="GOOGL MACD" class="img-fluid">
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <h5>Relative Strength Index (RSI)</h5>
+                    <div class="chart-container" data-bs-toggle="modal" data-bs-target="#chartModal" data-title="GOOGL RSI" data-img="charts/googl_rsi.png">
+                        <img src="charts/googl_rsi.png" alt="GOOGL RSI" class="img-fluid">
+                    </div>
+                    
+                    <h5>Bollinger Bands</h5>
+                    <div class="chart-container" data-bs-toggle="modal" data-bs-target="#chartModal" data-title="GOOGL Bollinger Bands" data-img="charts/googl_bollinger_bands.png">
+                        <img src="charts/googl_bollinger_bands.png" alt="GOOGL Bollinger Bands" class="img-fluid">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <h5>Trading Volume</h5>
+                    <div class="chart-container" data-bs-toggle="modal" data-bs-target="#chartModal" data-title="GOOGL Trading Volume" data-img="charts/googl_volume.png">
+                        <img src="charts/googl_volume.png" alt="GOOGL Trading Volume" class="img-fluid">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="competitors" class="mb-5">
+            <h2 class="section-title">Competitor Analysis</h2>
+            
+            <div class="card mb-4">
+                <div class="card-header bg-dark text-white">
+                    Market Position
+                </div>
+                <div class="card-body">
+                    <p>Alphabet Inc. (Google) is a leading technology company with a strong position in online search, digital advertising, cloud computing, and various other technology sectors. The company competes with other major tech giants across multiple business segments.</p>
+                    
+                    <h5 class="mt-4">Key Competitors</h5>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Company</th>
+                                    <th>Primary Business Areas</th>
+                                    <th>Key Competitive Areas</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Alphabet (GOOGL)</td>
+                                    <td>Search, Advertising, Cloud, AI</td>
+                                    <td>Search, Digital Advertising, Cloud Computing, AI/ML</td>
+                                </tr>
+                                <tr>
+                                    <td>Microsoft (MSFT)</td>
+                                    <td>Software, Cloud, AI</td>
+                                    <td>Cloud Computing, Search, AI/ML, Productivity Software</td>
+                                </tr>
+                                <tr>
+                                    <td>Apple (AAPL)</td>
+                                    <td>Hardware, Services, App Store</td>
+                                    <td>Mobile OS, Digital Services, App Ecosystem</td>
+                                </tr>
+                                <tr>
+                                    <td>Meta (META)</td>
+                                    <td>Social Media, Advertising, Metaverse</td>
+                                    <td>Digital Advertising, Social Media, AR/VR</td>
+                                </tr>
+                                <tr>
+                                    <td>Amazon (AMZN)</td>
+                                    <td>E-commerce, Cloud, Advertising</td>
+                                    <td>Cloud Computing, Digital Advertising, Smart Home</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>P/E Ratio Comparison</h5>
+                    <div class="chart-container" data-bs-toggle="modal" data-bs-target="#chartModal" data-title="P/E Ratio Comparison" data-img="charts/googl_pe_ratio_comparison.png">
+                        <img src="charts/googl_pe_ratio_comparison.png" alt="P/E Ratio Comparison" class="img-fluid">
+                    </div>
+                    
+                    <h5>Profit Margin Comparison</h5>
+                    <div class="chart-container" data-bs-toggle="modal" data-bs-target="#chartModal" data-title="Profit Margin Comparison" data-img="charts/googl_profit_margin_comparison.png">
+                        <img src="charts/googl_profit_margin_comparison.png" alt="Profit Margin Comparison" class="img-fluid">
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <h5>Return on Equity Comparison</h5>
+                    <div class="chart-container" data-bs-toggle="modal" data-bs-target="#chartModal" data-title="ROE Comparison" data-img="charts/googl_roe_comparison.png">
+                        <img src="charts/googl_roe_comparison.png" alt="ROE Comparison" class="img-fluid">
+                    </div>
+                    
+                    <h5>Revenue Growth Comparison</h5>
+                    <div class="chart-container" data-bs-toggle="modal" data-bs-target="#chartModal" data-title="Revenue Growth Comparison" data-img="charts/googl_revenue_growth_comparison.png">
+                        <img src="charts/googl_revenue_growth_comparison.png" alt="Revenue Growth Comparison" class="img-fluid">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Competitive Advantages
+                        </div>
+                        <div class="card-body">
+                            <ol>
+                                <li><strong>Search Dominance:</strong> Google maintains over 90% of the global search market share</li>
+                                <li><strong>Advertising Platform:</strong> Highly effective and extensive digital advertising ecosystem</li>
+                                <li><strong>AI/ML Capabilities:</strong> Leading research and implementation of artificial intelligence</li>
+                                <li><strong>YouTube Platform:</strong> World's largest video platform with over 2 billion monthly users</li>
+                                <li><strong>Android Ecosystem:</strong> Most widely used mobile operating system globally</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Competitive Challenges
+                        </div>
+                        <div class="card-body">
+                            <ol>
+                                <li><strong>Regulatory Scrutiny:</strong> Facing antitrust investigations in multiple jurisdictions</li>
+                                <li><strong>Privacy Concerns:</strong> Increasing pressure on data collection and privacy practices</li>
+                                <li><strong>Cloud Market Position:</strong> Currently third in cloud market behind AWS and Azure</li>
+                                <li><strong>Revenue Concentration:</strong> Still heavily dependent on advertising revenue</li>
+                                <li><strong>Competition in Emerging Tech:</strong> Facing strong competition in areas like AI and quantum computing</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="valuation" class="mb-5">
+            <h2 class="section-title">Valuation Analysis</h2>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Valuation Assessment
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Current Price:</strong> $150.72</p>
+                            <p><strong>Analyst Target Price:</strong> $220.00</p>
+                            <p><strong>Potential Upside:</strong> 46.0%</p>
+                            <p><strong>Valuation Assessment:</strong> Near Fair Value</p>
+                            <p><strong>Discount/Premium:</strong> 14%</p>
+                            <p><strong>Analyst Rating:</strong> BUY</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Growth Projections
+                        </div>
+                        <div class="card-body">
+                            <p>Alphabet is expected to continue growing its core advertising business while expanding its cloud computing segment and other initiatives. Key growth drivers include:</p>
+                            <ul>
+                                <li>Google Cloud Platform expansion</li>
+                                <li>YouTube subscription and advertising growth</li>
+                                <li>AI/ML integration across products and services</li>
+                                <li>Potential breakthroughs in moonshot projects (Waymo, health tech)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-header bg-dark text-white">
+                    Insider Trading Activity
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Position</th>
+                                    <th>Transaction</th>
+                                    <th>Shares</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>DRUMMOND DAVID C</td>
+                                    <td>Officer</td>
+                                    <td>Sale</td>
+                                    <td>N/A</td>
+                                    <td>2020-01-02</td>
+                                </tr>
+                                <tr>
+                                    <td>HENNESSY JOHN L</td>
+                                    <td>Director</td>
+                                    <td>Sale</td>
+                                    <td>N/A</td>
+                                    <td>2025-01-13</td>
+                                </tr>
+                                <tr>
+                                    <td>O TOOLE AMIE THUENER</td>
+                                    <td>Officer</td>
+                                    <td>Sale</td>
+                                    <td>447</td>
+                                    <td>2019-10-02</td>
+                                </tr>
+                                <tr>
+                                    <td>PAGE LAWRENCE E</td>
+                                    <td>Director and Beneficial Owner</td>
+                                    <td>Sale</td>
+                                    <td>758</td>
+                                    <td>2022-04-19</td>
+                                </tr>
+                                <tr>
+                                    <td>PICHAI SUNDAR</td>
+                                    <td>Chief Executive Officer</td>
+                                    <td>Conversion of Exercise</td>
+                                    <td>11.38k</td>
+                                    <td>2022-02-22</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="thesis" class="mb-5">
+            <h2 class="section-title">Investment Thesis</h2>
+            
+            <div class="card mb-4">
+                <div class="card-header bg-dark text-white">
+                    SWOT Analysis
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="text-success">Strengths</h5>
+                            <ol>
+                                <li><strong>Search Market Dominance:</strong> Google maintains approximately 90% of the global search market share</li>
+                                <li><strong>Advertising Revenue Engine:</strong> Highly effective digital advertising platform generating consistent cash flow</li>
+                                <li><strong>Financial Stability:</strong> Strong balance sheet with significant cash reserves and low debt</li>
+                                <li><strong>Diverse Revenue Streams:</strong> Growing diversification beyond advertising with Cloud, YouTube, and hardware</li>
+                                <li><strong>AI/ML Leadership:</strong> Cutting-edge research and implementation of artificial intelligence technologies</li>
+                            </ol>
+                            
+                            <h5 class="text-primary mt-4">Opportunities</h5>
+                            <ol>
+                                <li><strong>Cloud Growth Potential:</strong> Significant room for growth in the expanding cloud computing market</li>
+                                <li><strong>AI Monetization:</strong> Leveraging AI leadership into new products and services across various sectors</li>
+                                <li><strong>YouTube Expansion:</strong> Further monetization and growth of the YouTube platform</li>
+                                <li><strong>Hardware Ecosystem:</strong> Potential for expanded hardware offerings and ecosystem integration</li>
+                                <li><strong>Autonomous Vehicles:</strong> Long-term potential through Waymo's autonomous driving technology</li>
+                            </ol>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <h5 class="text-danger">Weaknesses</h5>
+                            <ol>
+                                <li><strong>Revenue Concentration:</strong> Still heavily dependent on advertising revenue despite diversification efforts</li>
+                                <li><strong>Regulatory Challenges:</strong> Facing antitrust investigations and potential regulations in multiple jurisdictions</li>
+                                <li><strong>Cloud Market Position:</strong> Currently third in cloud market behind AWS and Azure</li>
+                                <li><strong>Privacy Concerns:</strong> Increasing scrutiny and restrictions on data collection practices</li>
+                                <li><strong>Moonshot Investments:</strong> Some speculative investments in emerging technologies may not yield returns</li>
+                            </ol>
+                            
+                            <h5 class="text-warning mt-4">Threats</h5>
+                            <ol>
+                                <li><strong>Increasing Competition:</strong> Rising competition in core markets from both established players and new entrants</li>
+                                <li><strong>Regulatory Actions:</strong> Potential for adverse regulatory decisions affecting business model or requiring divestitures</li>
+                                <li><strong>Privacy Regulation:</strong> Stricter privacy laws could impact advertising effectiveness</li>
+                                <li><strong>Economic Sensitivity:</strong> Advertising revenue vulnerable to economic downturns</li>
+                                <li><strong>Technological Disruption:</strong> Potential for disruptive technologies to challenge current business models</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Investment Recommendations by Investor Type
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card mb-4">
+                                        <div class="card-header bg-success text-white">
+                                            Growth Investor: Buy
+                                        </div>
+                                        <div class="card-body">
+                                            <p>Alphabet offers compelling growth opportunities through its expanding cloud business, YouTube monetization, and AI initiatives. While not growing as rapidly as some smaller tech companies, GOOGL provides a more stable growth profile with less downside risk due to its strong market position and financial stability.</p>
+                                            <p><strong>Key Growth Drivers:</strong></p>
+                                            <ul>
+                                                <li>Google Cloud Platform expansion</li>
+                                                <li>YouTube subscription and advertising growth</li>
+                                                <li>AI/ML integration across products and services</li>
+                                                <li>Potential breakthroughs in moonshot projects (Waymo, health tech)</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="card mb-4">
+                                        <div class="card-header bg-success text-white">
+                                            Value Investor: Buy
+                                        </div>
+                                        <div class="card-body">
+                                            <p>Trading at a forward P/E of N/A, GOOGL offers reasonable value relative to its growth potential and market position. The company's strong cash flow, minimal debt, and substantial cash reserves provide a margin of safety. Recent stock price weakness presents an attractive entry point for value-oriented investors.</p>
+                                            <p><strong>Value Metrics:</strong></p>
+                                            <ul>
+                                                <li>Strong free cash flow generation</li>
+                                                <li>Substantial cash reserves</li>
+                                                <li>Low debt-to-equity ratio</li>
+                                                <li>Reasonable valuation relative to growth prospects</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="card mb-4">
+                                        <div class="card-header bg-danger text-white">
+                                            Income Investor: Hold/Avoid
+                                        </div>
+                                        <div class="card-body">
+                                            <p>Alphabet does not currently offer a significant dividend yield, making it less suitable for income-focused investors. While the company has initiated a dividend program, the yield remains low as the company prioritizes reinvestment in growth initiatives and share repurchases over dividend payments.</p>
+                                            <p><strong>Income Considerations:</strong></p>
+                                            <ul>
+                                                <li>Low dividend yield</li>
+                                                <li>Focus on share repurchases rather than dividend growth</li>
+                                                <li>Better income alternatives available in other sectors</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="card mb-4">
+                                        <div class="card-header bg-success text-white">
+                                            Balanced Investor: Buy
+                                        </div>
+                                        <div class="card-body">
+                                            <p>For balanced investors seeking a mix of growth and stability, GOOGL offers an attractive profile. The company's dominant market position, strong financials, and growth initiatives provide upside potential, while its cash reserves and business model resilience offer downside protection compared to more speculative tech investments.</p>
+                                            <p><strong>Balanced Portfolio Fit:</strong></p>
+                                            <ul>
+                                                <li>Exposure to technology sector growth with less volatility than smaller tech companies</li>
+                                                <li>Financial stability with growth potential</li>
+                                                <li>Reasonable valuation relative to quality and growth prospects</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-header bg-dark text-white">
+                    Conclusion
+                </div>
+                <div class="card-body">
+                    <p>Alphabet (GOOGL) represents a compelling investment opportunity for growth and balanced investors, with some appeal for value investors at current price levels. The company's dominant market position, financial strength, and investments in future growth areas provide a favorable risk-reward profile. While regulatory challenges and competition present risks, these appear to be adequately reflected in the current valuation.</p>
+                    <p>For most investors, a moderate position in GOOGL as part of a diversified portfolio is recommended, with potential to increase allocation during periods of market weakness. Income-focused investors should look elsewhere for more attractive dividend yields.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart Modal -->
+    <div class="modal fade" id="chartModal" tabindex="-1" aria-labelledby="chartModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="chartModalLabel">Chart</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <img id="modalChartImg" src="" alt="Chart" class="img-fluid">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white text-center py-3 mt-5">
+        <div class="container">
+            <p class="mb-0">Stock Analysis Dashboard &copy; 2025 | Data provided by Yahoo Finance</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set active nav item based on current page
+            document.querySelectorAll('.nav-link').forEach(link => {
+                if (link.getAttribute('href') === 'googl.html') {
+                    link.classList.add('active');
+                }
+            });
+            
+            // Update dropdown text to show current stock
+            document.getElementById('stockDropdown').textContent = 'Alphabet (GOOGL)';
+            
+            // Handle chart modal
+            const chartModal = document.getElementById('chartModal');
+            chartModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const title = button.getAttribute('data-title');
+                const imgSrc = button.getAttribute('data-img');
+                
+                const modalTitle = chartModal.querySelector('.modal-title');
+                const modalImg = document.getElementById('modalChartImg');
+                
+                modalTitle.textContent = title;
+                modalImg.src = imgSrc;
+                modalImg.alt = title;
+            });
+        });
+    </script>
+</body>
+</html>

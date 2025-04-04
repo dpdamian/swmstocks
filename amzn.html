@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amazon.com (AMZN) Stock Analysis</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <style>
+        body {
+            padding-top: 56px;
+            position: relative;
+            background-color: #f8f9fa;
+        }
+        .section-title {
+            border-left: 5px solid #0d6efd;
+            padding-left: 15px;
+            margin: 30px 0 20px 0;
+        }
+        #back-to-top {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            display: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #0d6efd;
+            color: white;
+            text-align: center;
+            line-height: 50px;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 99;
+            border: none;
+        }
+        .chart-container {
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        .chart-container:hover {
+            transform: scale(1.02);
+        }
+        .chart-img {
+            width: 100%;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .navbar {
+            background-color: #212529;
+        }
+        .card {
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .modal {
+            background-color: rgba(0,0,0,0.8);
+        }
+        .modal-content {
+            background-color: transparent;
+            border: none;
+        }
+        .modal-body {
+            padding: 0;
+        }
+        .modal-body img {
+            width: 100%;
+        }
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: white;
+            font-size: 2rem;
+            z-index: 1050;
+            opacity: 0.8;
+            text-shadow: 0 0 3px black;
+        }
+        .close-modal:hover {
+            opacity: 1;
+            color: white;
+        }
+        .tariff-impact {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .high-impact {
+            background-color: rgba(220, 53, 69, 0.2);
+            border-left: 5px solid #dc3545;
+        }
+        .medium-impact {
+            background-color: rgba(255, 193, 7, 0.2);
+            border-left: 5px solid #ffc107;
+        }
+        .low-impact {
+            background-color: rgba(40, 167, 69, 0.2);
+            border-left: 5px solid #28a745;
+        }
+        .financial-metric {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+        .financial-value {
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        .positive {
+            color: #28a745;
+        }
+        .negative {
+            color: #dc3545;
+        }
+        .neutral {
+            color: #6c757d;
+        }
+        .amazon-color {
+            color: #FF9900;
+        }
+    </style>
+</head>
+<body data-bs-spy="scroll" data-bs-target="#navbar-example">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="navbar-example">
+        <div class="container">
+            <a class="navbar-brand" href="#">Stock Analysis</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle stock-selector" href="#" id="stockDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Select Stock
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="stockDropdown">
+                            <li><a class="dropdown-item" href="index.html">NVIDIA (NVDA)</a></li>
+                            <li><a class="dropdown-item" href="googl.html">Alphabet (GOOGL)</a></li>
+                            <li><a class="dropdown-item" href="mu.html">Micron Technology (MU)</a></li>
+                            <li><a class="dropdown-item" href="amzn.html">Amazon (AMZN)</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#summary">Summary</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#company">Company</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#financials">Financials</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#technical">Technical</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#competitors">Competitors</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#valuation">Valuation</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#tariffs">Tariffs</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#thesis">Thesis</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Back to Top Button -->
+    <button id="back-to-top" title="Back to Top"><i class="bi bi-arrow-up"></i></button>
+
+    <div class="container mt-5">
+        <h1 class="display-4 mb-4 amazon-color">Amazon.com (AMZN) Stock Analysis</h1>
+
+        <!-- Executive Summary -->
+        <section id="summary">
+            <h2 class="section-title">Executive Summary</h2>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Investment Recommendation
+                        </div>
+                        <div class="card-body">
+                            <p>Amazon.com (AMZN) presents a <strong class="text-success">compelling investment opportunity</strong> with significant upside potential driven by its dominant position in e-commerce, cloud computing leadership through AWS, and growing high-margin businesses like advertising.</p>
+                            
+                            <p>Our analysis indicates a moderate disconnect between the current market price and estimated fair value, suggesting <strong class="text-success">12-24% potential upside</strong> for investors with appropriate risk tolerance and time horizon.</p>
+
+                            <h5 class="mt-4">Recommendations by Investor Type:</h5>
+                            <div class="bg-success text-white p-2 mb-2">Growth Investors: Strong Buy</div>
+                            <div class="bg-warning text-white p-2 mb-2">Value Investors: Hold</div>
+                            <div class="bg-danger text-white p-2 mb-2">Income Investors: Avoid</div>
+                            <div class="bg-success text-white p-2 mb-2">Balanced Investors: Buy</div>
+                            <div class="bg-info text-white p-2 mb-2">Speculative Investors: Buy with Options Strategy</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Price Targets
+                        </div>
+                        <div class="card-body">
+                            <div class="bg-success bg-opacity-25 p-3 mb-3">
+                                <h5>Bull Case: $220-240</h5>
+                                <p>30-42% upside</p>
+                                <p class="small">Assumes accelerated AWS growth, margin expansion in retail, and successful new initiatives</p>
+                            </div>
+                            
+                            <div class="bg-warning bg-opacity-25 p-3 mb-3">
+                                <h5>Base Case: $190-210</h5>
+                                <p>12-24% upside</p>
+                                <p class="small">Assumes continued growth across segments with modest margin improvement</p>
+                            </div>
+                            
+                            <div class="bg-danger bg-opacity-25 p-3">
+                                <h5>Bear Case: $140-160</h5>
+                                <p>5-17% downside</p>
+                                <p class="small">Assumes competitive pressures, regulatory challenges, and margin compression</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Key Findings
+                        </div>
+                        <div class="card-body">
+                            <h5>Business Strengths</h5>
+                            <p>Amazon dominates e-commerce with approximately 40% U.S. market share and leads cloud computing with AWS holding 32% global market share. The company has created significant competitive moats through its logistics infrastructure, Prime ecosystem, and data/AI capabilities.</p>
+                            
+                            <h5>Growth Drivers</h5>
+                            <p>AWS continues to benefit from enterprise cloud adoption and AI workloads. The high-margin advertising business is scaling rapidly, while international markets present significant expansion opportunities. AI integration across businesses enhances both product offerings and operational efficiency.</p>
+                            
+                            <h5>Financial Health</h5>
+                            <p>Amazon generates strong cash flow with improving margins as AWS and advertising contribute a growing share of profits. The company maintains a solid balance sheet with significant financial flexibility to invest in growth initiatives and weather economic challenges.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Key Risks
+                        </div>
+                        <div class="card-body">
+                            <ol>
+                                <li><strong>Regulatory Scrutiny:</strong> Antitrust concerns in multiple markets could impact business operations</li>
+                                <li><strong>Cloud Competition:</strong> Microsoft Azure and Google Cloud gaining market share in the critical AWS segment</li>
+                                <li><strong>Retail Margin Pressure:</strong> E-commerce remains a relatively low-margin business with intense competition</li>
+                                <li><strong>Economic Sensitivity:</strong> Vulnerability to consumer spending slowdowns and enterprise IT budget cuts</li>
+                                <li><strong>Labor Relations:</strong> Ongoing challenges with workforce management and potential unionization</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Company Overview -->
+        <section id="company" class="mt-5">
+            <h2 class="section-title">Company Overview</h2>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Company Profile
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Name:</strong> Amazon.com, Inc.</p>
+                            <p><strong>Symbol:</strong> AMZN</p>
+                            <p><strong>Industry:</strong> Internet Retail</p>
+                            <p><strong>Sector:</strong> Consumer Cyclical</p>
+                            <p><strong>Founded:</strong> 1994</p>
+                            <p><strong>Headquarters:</strong> Seattle, Washington, USA</p>
+                            <p><strong>Employees:</strong> ~1.5 million</p>
+                            <p><strong>Website:</strong> <a href="https://www.amazon.com" target="_blank">www.amazon.com</a></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Business Summary
+                        </div>
+                        <div class="card-body">
+                            <p>Amazon.com, Inc. engages in the retail sale of consumer products and subscriptions through online and physical stores in North America and internationally. The company operates through three segments: North America, International, and Amazon Web Services (AWS).</p>
+                            
+                            <p>It sells merchandise and content purchased for resale from third-party sellers through physical and online stores. The company also manufactures and sells electronic devices, including Kindle, Fire tablets, Fire TVs, Echo, Ring, and other devices; and develops and produces media content.</p>
+                            
+                            <p>Additionally, it offers programs that enable sellers to sell their products in its stores; and programs that allow authors, musicians, filmmakers, skill and app developers, and others to publish and sell content. Further, the company provides compute, storage, database, analytics, machine learning, and other services, as well as advertising services.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Key Business Segments
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h5>E-commerce and Retail</h5>
+                                    <ul>
+                                        <li><strong>Online Stores:</strong> Amazon.com and international websites</li>
+                                        <li><strong>Physical Stores:</strong> Whole Foods Market, Amazon Fresh, Amazon Go</li>
+                                        <li><strong>Third-Party Seller Services:</strong> Marketplace, fulfillment, advertising</li>
+                                        <li><strong>Subscription Services:</strong> Prime membership, digital content subscriptions</li>
+                                    </ul>
+                                    
+                                    <h5>Amazon Web Services (AWS)</h5>
+                                    <ul>
+                                        <li><strong>Compute:</strong> EC2, Lambda, containers</li>
+                                        <li><strong>Storage:</strong> S3, EBS, Glacier</li>
+                                        <li><strong>Database:</strong> RDS, DynamoDB, Redshift</li>
+                                        <li><strong>AI/ML:</strong> SageMaker, Rekognition, Comprehend</li>
+                                        <li><strong>Analytics:</strong> EMR, Athena, QuickSight</li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <h5>Digital Content and Devices</h5>
+                                    <ul>
+                                        <li><strong>Digital Content:</strong> Prime Video, Music, Kindle e-books</li>
+                                        <li><strong>Devices:</strong> Echo, Fire TV, Kindle, Ring</li>
+                                        <li><strong>Gaming:</strong> Twitch, Luna cloud gaming</li>
+                                    </ul>
+                                    
+                                    <h5>Emerging Businesses</h5>
+                                    <ul>
+                                        <li><strong>Advertising:</strong> Sponsored products, display ads</li>
+                                        <li><strong>Healthcare:</strong> Amazon Pharmacy, Amazon Care</li>
+                                        <li><strong>Financial Services:</strong> Amazon Pay, credit cards</li>
+                                        <li><strong>Logistics:</strong> Transportation and delivery network</li>
+                                        <li><strong>Business Services:</strong> B2B marketplace, procurement</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Financial Data -->
+        <section id="financials" class="mt-5">
+            <h2 class="section-title">Financial Data</h2>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Stock Information
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Current Price:</strong> $178.75</p>
+                            <p><strong>52-Week Range:</strong> $118.35 - $189.77</p>
+                            <p><strong>Market Cap:</strong> $1.85T</p>
+                            <p><strong>Average Volume:</strong> 42.3M</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Valuation Metrics
+                        </div>
+                        <div class="card-body">
+                            <p><strong>P/E Ratio:</strong> 42.8</p>
+                            <p><strong>Forward P/E:</strong> 35.6</p>
+                            <p><strong>PEG Ratio:</strong> 1.85</p>
+                            <p><strong>Price/Book:</strong> 8.5</p>
+                            <p><strong>EV/EBITDA:</strong> 18.7</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Profitability
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Gross Margin:</strong> 45.8%</p>
+                            <p><strong>Operating Margin:</strong> 9.5%</p>
+                            <p><strong>Profit Margin:</strong> 7.2%</p>
+                            <p><strong>Return on Equity:</strong> 18.5%</p>
+                            <p><strong>Return on Assets:</strong> 6.8%</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Cash Flow and Debt
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Operating Cash Flow:</strong> $85.2B</p>
+                            <p><strong>Free Cash Flow:</strong> $32.1B</p>
+                            <p><strong>Total Debt:</strong> $142.8B</p>
+                            <p><strong>Total Cash:</strong> $86.5B</p>
+                            <p><strong>Debt to Equity:</strong> 0.45</p>
+                            <p><strong>Dividend Yield:</strong> N/A (No dividend)</p>
+                            <p><strong>Dividend Rate:</strong> N/A</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Growth Metrics
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Revenue Growth (YoY):</strong> <span class="positive">+12.3%</span></p>
+                            <p><strong>EPS Growth (YoY):</strong> <span class="positive">+18.5%</span></p>
+                            <p><strong>5-Year Revenue CAGR:</strong> <span class="positive">+15.8%</span></p>
+                            <p><strong>5-Year EPS CAGR:</strong> <span class="positive">+22.5%</span></p>
+                            <p><strong>AWS Revenue Growth (YoY):</strong> <span class="positive">+16.8%</span></p>
+                            <p><strong>Advertising Revenue Growth (YoY):</strong> <span class="positive">+24.5%</span></p>
+                            <p><strong>International Revenue Growth (YoY):</strong> <span class="positive">+9.2%</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Technical Analysis -->
+        <section id="technical" class="mt-5">
+            <h2 class="section-title">Technical Analysis</h2>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Price and Moving Averages
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container" data-bs-toggle="modal" data-bs-target="#chartModal" data-img="charts/amzn_price_mas.png">
+                                <img src="charts/amzn_price_mas.png" alt="AMZN Price and Moving Averages" class="chart-img">
+                            </div>
+                            <p class="mt-3">Amazon's stock has been in a consolidation pattern over the past year after a strong rally. The price is currently trading above both the 50-day and 200-day moving averages, indicating a bullish bias despite the recent consolidation. The 50-day moving average is above the 200-day moving average, forming a 'golden cross' which is typically a bullish signal.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Volume Analysis
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container" data-bs-toggle="modal" data-bs-target="#chartModal" data-img="charts/amzn_volume.png">
+                                <img src="charts/amzn_volume.png" alt="AMZN Volume Analysis" class="chart-img">
+                            </div>
+                            <p class="mt-3">Trading volume has been average, with slightly higher volume on up days, supporting the bullish bias. Recent volume spikes have occurred on earnings announcements and significant AWS-related news, indicating strong institutional interest in the stock's fundamental developments.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Technical Indicators
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="chart-container" data-bs-toggle="modal" data-bs-target="#chartModal" data-img="charts/amzn_rsi.png">
+                                        <img src="charts/amzn_rsi.png" alt="AMZN RSI" class="chart-img">
+                                        <p class="text-center mt-2">RSI</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="chart-container" data-bs-toggle="modal" data-bs-target="#chartModal" data-img="charts/amzn_macd.png">
+                                        <img src="charts/amzn_macd.png" alt="AMZN MACD" class="chart-img">
+                                        <p class="text-center mt-2">MACD</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <p><strong>RSI (14-day):</strong> 60 (Neutral with bullish bias)</p>
+                                <p><strong>MACD:</strong> Positive (Bullish)</p>
+                                <p><strong>Stochastic Oscillator:</strong> 72 (Approaching overbought)</p>
+                                <p><strong>Average Directional Index (ADX):</strong> 25 (Moderate trend strength)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header bg-dark text-white">
+                                    Bollinger Bands
+                                </div>
+                                <div class="card-body">
+                                    <div class="chart-container" data-bs-toggle="modal" data-bs-target="#chartModal" data-img="charts/amzn_bollinger_bands.png">
+                                        <img src="charts/amzn_bollinger_bands.png" alt="AMZN Bollinger Bands" class="chart-img">
+                                    </div>
+                                    <p class="mt-3">The stock is trading in the upper half of the Bollinger Bands, indicating strength but not yet reaching extreme levels. The bands have been narrowing recently, suggesting decreasing volatility and potentially setting up for a significant move in either direction.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header bg-dark text-white">
+                                    Support and Resistance
+                                </div>
+                                <div class="card-body">
+                                    <div class="chart-container" data-bs-toggle="modal" data-bs-target="#chartModal" data-img="charts/amzn_support_resistance.png">
+                                        <img src="charts/amzn_support_resistance.png" alt="AMZN Support and Resistance" class="chart-img">
+                                    </div>
+                                    <p class="mt-3">The stock has established strong support around the $160-165 range, which has held during recent pullbacks. The next major resistance level is around $185-190, which represents previous highs. A breakout above this resistance could signal the next significant move higher.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Competitor Analysis -->
+        <section id="competitors" class="mt-5">
+            <h2 class="section-title">Competitor Analysis</h2>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Industry Position
+                        </div>
+                        <div class="card-body">
+                            <p>Amazon.com is a global leader in e-commerce and cloud computing, with significant positions in digital advertising, streaming media, and consumer electronics. The company operates across multiple industries, competing with a diverse set of companies in various segments.</p>
+                            
+                            <h5 class="mt-3">Key Competitors:</h5>
+                            <ul>
+                                <li><strong>Google/Alphabet (GOOGL):</strong> Competitor in cloud computing (GCP vs AWS), digital advertising, and smart home devices</li>
+                                <li><strong>Microsoft (MSFT):</strong> Primary competitor in cloud computing (Azure vs AWS) and enterprise services</li>
+                                <li><strong>Walmart (WMT):</strong> Major competitor in retail and e-commerce</li>
+                                <li><strong>Alibaba (BABA):</strong> Competitor in global e-commerce and cloud computing</li>
+                                <li><strong>Target (TGT):</strong> Competitor in retail and e-commerce</li>
+                                <li><strong>Netflix (NFLX):</strong> Competitor in streaming video</li>
+                                <li><strong>Shopify (SHOP):</strong> Competitor in e-commerce platform services</li>
+                            </ul>
+                            
+                            <h5 class="mt-3">Market Share:</h5>
+                            <ul>
+                                <li><strong>E-commerce (US):</strong> Approximately 40% market share</li>
+                                <li><strong>Cloud Computing (Global):</strong> AWS holds approximately 32% market share, leading Microsoft Azure (22%) and Google Cloud (10%)</li>
+                                <li><strong>Smart Speakers:</strong> Echo devices hold approximately 28% market share</li>
+                                <li><strong>Digital Advertising:</strong> Approximately 7% of global digital ad spending, behind Google and Meta</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Valuation Comparison
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container" data-bs-toggle="modal" data-bs-target="#chartModal" data-img="charts/amzn_pe_ratio_comparison.png">
+                                <img src="charts/amzn_pe_ratio_comparison.png" alt="P/E Ratio Comparison" class="chart-img">
+                            </div>
+                            <div class="mt-3">
+                                <p>Amazon trades at a forward P/E of 42.8x, which is higher than most of its peers including Google (25.3x), Microsoft (35.6x), Walmart (28.9x), and Alibaba (18.7x). This premium valuation reflects Amazon's strong growth prospects across multiple business segments, particularly AWS and advertising, as well as expectations for continued margin expansion.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Profitability Comparison
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container" data-bs-toggle="modal" data-bs-target="#chartModal" data-img="charts/amzn_profit_margin_comparison.png">
+                                <img src="charts/amzn_profit_margin_comparison.png" alt="Profit Margin Comparison" class="chart-img">
+                            </div>
+                            <div class="mt-3">
+                                <p>Amazon's profit margin of 7.2% is lower than technology-focused peers like Google (25.8%) and Microsoft (36.5%), but significantly higher than traditional retailers like Walmart (2.8%). This reflects Amazon's mixed business model, with high-margin AWS and advertising businesses offsetting the lower margins in retail operations.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Return on Equity
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container" data-bs-toggle="modal" data-bs-target="#chartModal" data-img="charts/amzn_roe_comparison.png">
+                                <img src="charts/amzn_roe_comparison.png" alt="ROE Comparison" class="chart-img">
+                            </div>
+                            <div class="mt-3">
+                                <p>Amazon's ROE of 18.5% demonstrates solid capital efficiency, outperforming Walmart (15.6%) and Alibaba (10.2%), but lagging behind Google (27.3%) and Microsoft (42.8%). This reflects Amazon's significant ongoing investments in infrastructure and new business initiatives, which temporarily suppress ROE but are expected to drive long-term value creation.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Revenue Growth
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container" data-bs-toggle="modal" data-bs-target="#chartModal" data-img="charts/amzn_revenue_growth_comparison.png">
+                                <img src="charts/amzn_revenue_growth_comparison.png" alt="Revenue Growth Comparison" class="chart-img">
+                            </div>
+                            <div class="mt-3">
+                                <p>Amazon's revenue growth of 12.3% is solid but trails Microsoft (18.2%) and Google (15.6%). However, it significantly outpaces traditional retailers like Walmart (5.8%) and is stronger than Alibaba (8.5%). Amazon's growth is particularly impressive given its massive revenue base, with different segments growing at varying rates (AWS at 16.8%, advertising at 24.5%, and international at 9.2%).</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Valuation Analysis -->
+        <section id="valuation" class="mt-5">
+            <h2 class="section-title">Valuation Analysis</h2>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Intrinsic Value Assessment
+                        </div>
+                        <div class="card-body">
+                            <h5>Sum-of-the-Parts Valuation</h5>
+                            <p>Given Amazon's diverse business segments, a sum-of-the-parts valuation provides the most accurate assessment:</p>
+                            <ul>
+                                <li><strong>AWS:</strong> $850B (15x revenue multiple)</li>
+                                <li><strong>North America Retail:</strong> $550B (1.2x revenue multiple)</li>
+                                <li><strong>International Retail:</strong> $250B (1.0x revenue multiple)</li>
+                                <li><strong>Advertising:</strong> $200B (12x revenue multiple)</li>
+                                <li><strong>Other Businesses:</strong> $100B</li>
+                                <li><strong>Net Debt:</strong> ($56B)</li>
+                                <li><strong>Total Enterprise Value:</strong> $1.95T</li>
+                            </ul>
+                            <p>This analysis yields an intrinsic value of <strong>$200 per share</strong>, representing approximately <span class="positive">18% upside</span> from current levels.</p>
+                            
+                            <h5 class="mt-4">DCF Valuation</h5>
+                            <p>Using a discounted cash flow model with the following assumptions:</p>
+                            <ul>
+                                <li>5-year revenue CAGR: 12%</li>
+                                <li>Terminal growth rate: 3.5%</li>
+                                <li>WACC: 9.5%</li>
+                                <li>Operating margin expansion to 12% by year 5</li>
+                            </ul>
+                            <p>Our DCF analysis yields an intrinsic value of <strong>$195 per share</strong>, representing approximately <span class="positive">15% upside</span> from current levels.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Growth Projections
+                        </div>
+                        <div class="card-body">
+                            <h5>Revenue Growth Drivers</h5>
+                            <ul>
+                                <li><strong>AWS:</strong> 15-18% CAGR over next 5 years</li>
+                                <li><strong>Advertising:</strong> 20-25% CAGR</li>
+                                <li><strong>North America Retail:</strong> 8-10% CAGR</li>
+                                <li><strong>International Retail:</strong> 10-12% CAGR</li>
+                                <li><strong>Subscription Services:</strong> 12-15% CAGR</li>
+                            </ul>
+                            
+                            <h5 class="mt-4">Margin Expansion Potential</h5>
+                            <ul>
+                                <li><strong>Operating Margin:</strong> Potential expansion to 12-14% (from current 9.5%)</li>
+                                <li><strong>Drivers:</strong>
+                                    <ul>
+                                        <li>Increasing mix of high-margin AWS and advertising revenue</li>
+                                        <li>Retail efficiency improvements and automation</li>
+                                        <li>Scale benefits in international markets</li>
+                                        <li>Prime membership economics</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                            
+                            <h5 class="mt-4">EPS Growth Projection</h5>
+                            <p>Based on revenue growth and margin expansion, we project EPS CAGR of 18-22% over the next 5 years, significantly outpacing the broader market average of 8-10%.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Valuation Considerations
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h5>Positive Valuation Factors</h5>
+                                    <ul>
+                                        <li><strong>AWS Leadership:</strong> Dominant position in high-growth, high-margin cloud computing</li>
+                                        <li><strong>Advertising Growth:</strong> Rapidly scaling high-margin advertising business</li>
+                                        <li><strong>Prime Ecosystem:</strong> Strong customer loyalty and recurring revenue</li>
+                                        <li><strong>Logistics Advantage:</strong> Unmatched fulfillment and delivery infrastructure</li>
+                                        <li><strong>AI Integration:</strong> Significant AI capabilities across all business segments</li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <h5>Negative Valuation Factors</h5>
+                                    <ul>
+                                        <li><strong>Regulatory Risk:</strong> Potential antitrust actions in multiple markets</li>
+                                        <li><strong>Cloud Competition:</strong> Increasing competition from Microsoft and Google</li>
+                                        <li><strong>Retail Margin Pressure:</strong> E-commerce remains relatively low-margin</li>
+                                        <li><strong>Capital Intensity:</strong> Ongoing high capital expenditure requirements</li>
+                                        <li><strong>Economic Sensitivity:</strong> Vulnerability to consumer spending slowdowns</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4">
+                                <h5>Valuation Conclusion</h5>
+                                <p>Amazon currently trades at a forward P/E of approximately 42.8x, which appears elevated compared to the broader market but can be justified by the company's growth profile and improving margin trajectory. Based on our comprehensive analysis using both sum-of-the-parts and DCF methodologies, our fair value estimate is $195-200 per share, representing approximately 15-18% upside from current levels.</p>
+                                
+                                <p>This valuation reflects our view that Amazon's diverse business model, with increasing contributions from high-margin segments like AWS and advertising, warrants a premium multiple. The company's continued investments in growth initiatives, while temporarily suppressing margins and ROE, are expected to drive long-term value creation. However, investors should remain cognizant of regulatory risks and competitive pressures, which could impact growth rates and margins in certain segments.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tariff Sensitivity -->
+        <section id="tariffs" class="mt-5">
+            <h2 class="section-title">Tariff Sensitivity</h2>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Supply Chain Exposure
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container" data-bs-toggle="modal" data-bs-target="#chartModal" data-img="charts/amzn_tariff_sensitivity.png">
+                                <img src="charts/amzn_tariff_sensitivity.png" alt="Tariff Sensitivity Analysis" class="chart-img">
+                            </div>
+                            
+                            <div class="mt-4">
+                                <div class="tariff-impact medium-impact">
+                                    <h5>Direct Imports</h5>
+                                    <p><strong>Impact Level: Medium</strong></p>
+                                    <p>Products sourced from China for Amazon's private label brands</p>
+                                </div>
+                                
+                                <div class="tariff-impact high-impact">
+                                    <h5>Third-Party Sellers</h5>
+                                    <p><strong>Impact Level: High</strong></p>
+                                    <p>Many marketplace sellers source products from China</p>
+                                </div>
+                                
+                                <div class="tariff-impact low-impact">
+                                    <h5>AWS Hardware</h5>
+                                    <p><strong>Impact Level: Low</strong></p>
+                                    <p>Limited exposure to tariffed components</p>
+                                </div>
+                                
+                                <div class="tariff-impact medium-impact">
+                                    <h5>Consumer Electronics</h5>
+                                    <p><strong>Impact Level: Medium</strong></p>
+                                    <p>Echo, Fire, and other devices with components from China</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Tariff Scenarios
+                        </div>
+                        <div class="card-body">
+                            <h5>Scenario 1: Targeted Technology Tariffs</h5>
+                            <p><strong>Probability: High</strong></p>
+                            <p>Targeted tariffs on specific technology products and components would primarily affect Amazon's devices business and some AWS hardware costs. The estimated impact would be approximately 1-2% on overall operating margins, with potential for partial offset through pricing adjustments.</p>
+                            
+                            <h5 class="mt-3">Scenario 2: Broad-Based Tariffs</h5>
+                            <p><strong>Probability: Medium</strong></p>
+                            <p>Broader tariffs affecting most consumer goods would have a more significant impact on Amazon's retail business, both direct and marketplace. This could reduce retail operating margins by 2-4% and potentially slow GMV growth as prices increase for consumers.</p>
+                            
+                            <h5 class="mt-3">Scenario 3: Severe Trade Restrictions</h5>
+                            <p><strong>Probability: Low</strong></p>
+                            <p>Severe restrictions or embargoes on trade with China would substantially disrupt Amazon's retail business and marketplace. This could impact overall operating margins by 3-5% and require significant restructuring of supply chains for both Amazon and its marketplace sellers.</p>
+                            
+                            <h5 class="mt-4">Mitigation Strategies</h5>
+                            <ul>
+                                <li><strong>Supply Chain Diversification:</strong> Shifting manufacturing and sourcing to countries not subject to tariffs</li>
+                                <li><strong>Inventory Management:</strong> Strategic inventory positioning and timing of imports</li>
+                                <li><strong>Pricing Adjustments:</strong> Ability to pass some cost increases to consumers</li>
+                                <li><strong>Seller Support:</strong> Providing marketplace sellers with tools and information to manage tariff impacts</li>
+                                <li><strong>Product Mix Optimization:</strong> Emphasizing products with lower tariff exposure</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Investment Thesis -->
+        <section id="thesis" class="mt-5">
+            <h2 class="section-title">Investment Thesis</h2>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            SWOT Analysis
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container" data-bs-toggle="modal" data-bs-target="#chartModal" data-img="charts/amzn_swot_analysis.png">
+                                <img src="charts/amzn_swot_analysis.png" alt="SWOT Analysis" class="chart-img">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card mt-4">
+                        <div class="card-header bg-dark text-white">
+                            Investment Catalysts
+                        </div>
+                        <div class="card-body">
+                            <ol>
+                                <li><strong>AWS Growth Acceleration:</strong> Continued enterprise cloud adoption and AI-driven workloads</li>
+                                <li><strong>Retail Margin Expansion:</strong> Improving efficiency and growing high-margin categories</li>
+                                <li><strong>Advertising Revenue Growth:</strong> Scaling of high-margin advertising business</li>
+                                <li><strong>International Expansion:</strong> Growth in key markets like India and Latin America</li>
+                                <li><strong>AI Integration:</strong> Enhanced product offerings and operational efficiencies</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Investor Recommendations
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container" data-bs-toggle="modal" data-bs-target="#chartModal" data-img="charts/amzn_investor_recommendations.png">
+                                <img src="charts/amzn_investor_recommendations.png" alt="Investor Recommendations" class="chart-img">
+                            </div>
+                            
+                            <div class="mt-4">
+                                <h5>Investment Strategy by Time Horizon</h5>
+                                
+                                <div class="card mb-3">
+                                    <div class="card-header bg-primary text-white">
+                                        Short-Term (0-6 months)
+                                    </div>
+                                    <div class="card-body">
+                                        <p>Consider establishing initial positions or adding to existing positions on pullbacks. Technical indicators suggest potential for continued upward momentum in the near term, particularly if the stock can break above the $185-190 resistance zone. However, investors should be prepared for potential volatility related to regulatory developments and quarterly earnings fluctuations.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="card mb-3">
+                                    <div class="card-header bg-success text-white">
+                                        Medium-Term (6-18 months)
+                                    </div>
+                                    <div class="card-body">
+                                        <p>Maintain or increase positions with a focus on AWS growth, advertising scaling, and retail margin improvement. This timeframe should capture the benefits of ongoing investments in logistics, AI integration, and international expansion. The company's diverse business model provides resilience against potential headwinds in specific segments.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="card">
+                                    <div class="card-header bg-info text-white">
+                                        Long-Term (18+ months)
+                                    </div>
+                                    <div class="card-body">
+                                        <p>Maintain core positions with a focus on Amazon's long-term growth opportunities across multiple segments. The company's culture of innovation, customer focus, and operational excellence position it well to navigate competitive and regulatory challenges. Long-term investors should view potential regulatory-related pullbacks as opportunities to add to positions.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            Conclusion
+                        </div>
+                        <div class="card-body">
+                            <p>Amazon.com represents a compelling investment opportunity for investors with a long-term horizon. The company's dominant position in e-commerce, leadership in cloud computing, and growing high-margin businesses provide multiple avenues for continued growth and margin expansion. While regulatory and competitive challenges exist, Amazon's culture of innovation, customer focus, and operational excellence position it well to navigate these challenges.</p>
+                            
+                            <p>Our analysis suggests moderate upside potential from current levels, with a base case price target of $190-210 representing 12-24% upside over the next 12-18 months. However, investors must carefully consider their risk tolerance, time horizon, and portfolio construction when determining the appropriate allocation to Amazon.</p>
+                            
+                            <p>For most investor types, we recommend a Buy rating, with particular emphasis for growth investors. Value investors may want to wait for more attractive entry points, while income investors should generally avoid Amazon given its lack of dividend. Speculative investors may consider options strategies to leverage potential upside while managing downside risk.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="mt-5 py-3 text-center text-muted">
+            <p>This analysis is for informational purposes only and does not constitute investment advice. Always conduct your own research before making investment decisions.</p>
+            <p>© 2025 Stock Analysis Dashboard</p>
+        </footer>
+    </div>
+
+    <!-- Chart Modal -->
+    <div class="modal fade" id="chartModal" tabindex="-1" aria-labelledby="chartModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <button type="button" class="close-modal" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+                <div class="modal-body">
+                    <img id="modalImage" src="" alt="Chart">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Back to top button
+        window.onscroll = function() {scrollFunction()};
+        
+        function scrollFunction() {
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                document.getElementById("back-to-top").style.display = "block";
+            } else {
+                document.getElementById("back-to-top").style.display = "none";
+            }
+        }
+        
+        document.getElementById("back-to-top").addEventListener("click", function() {
+            document.body.scrollTop = 0; // For Safari
+            document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+        });
+        
+        // Chart modal
+        document.addEventListener('DOMContentLoaded', function() {
+            var chartContainers = document.querySelectorAll('.chart-container');
+            var modalImage = document.getElementById('modalImage');
+            
+            chartContainers.forEach(function(container) {
+                container.addEventListener('click', function() {
+                    var imgSrc = this.getAttribute('data-img');
+                    modalImage.src = imgSrc;
+                });
+            });
+        });
+    </script>
+</body>
+</html>

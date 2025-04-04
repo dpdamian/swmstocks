@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NVIDIA (NVDA) Stock Analysis</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --nvda-green: #76b900;
+            --nvda-dark: #333333;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding-top: 56px;
+        }
+        .navbar {
+            background-color: var(--nvda-dark);
+        }
+        .navbar-brand {
+            font-weight: bold;
+            color: var(--nvda-green) !important;
+        }
+        .nav-link {
+            color: white !important;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: var(--nvda-green) !important;
+        }
+        .section-title {
+            color: var(--nvda-dark);
+            border-bottom: 3px solid var(--nvda-green);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .card {
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .card-header {
+            background-color: var(--nvda-dark);
+            color: white;
+            font-weight: bold;
+        }
+        .highlight {
+            color: var(--nvda-green);
+            font-weight: bold;
+        }
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin-bottom: 30px;
+        }
+        .recommendation {
+            font-size: 1.2rem;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        .strong-buy {
+            background-color: #28a745;
+            color: white;
+        }
+        .buy {
+            background-color: #5cb85c;
+            color: white;
+        }
+        .hold {
+            background-color: #ffc107;
+            color: black;
+        }
+        .avoid {
+            background-color: #dc3545;
+            color: white;
+        }
+        .tab-content {
+            padding: 20px;
+            border: 1px solid #dee2e6;
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+        }
+        .price-target {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        .bull-case {
+            background-color: rgba(40, 167, 69, 0.2);
+            border-left: 5px solid #28a745;
+        }
+        .base-case {
+            background-color: rgba(255, 193, 7, 0.2);
+            border-left: 5px solid #ffc107;
+        }
+        .bear-case {
+            background-color: rgba(220, 53, 69, 0.2);
+            border-left: 5px solid #dc3545;
+        }
+        .swot-card {
+            height: 100%;
+        }
+        .strengths-header {
+            background-color: #28a745;
+        }
+        .weaknesses-header {
+            background-color: #dc3545;
+        }
+        .opportunities-header {
+            background-color: #17a2b8;
+        }
+        .threats-header {
+            background-color: #ffc107;
+            color: black;
+        }
+        .footer {
+            background-color: var(--nvda-dark);
+            color: white;
+            padding: 20px 0;
+            margin-top: 50px;
+        }
+        #back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: none;
+            background-color: var(--nvda-green);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 1000;
+        }
+        .chart-img {
+            max-width: 100%;
+            height: auto;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        .chart-img:hover {
+            transform: scale(1.02);
+        }
+        .modal-content {
+            background-color: transparent;
+            border: none;
+        }
+        .modal-body {
+            padding: 0;
+        }
+        .modal-body img {
+            width: 100%;
+        }
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: white;
+            font-size: 2rem;
+            z-index: 1050;
+            opacity: 0.8;
+            text-shadow: 0 0 3px black;
+        }
+        .close-modal:hover {
+            opacity: 1;
+            color: white;
+        }
+        .tariff-impact {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .high-impact {
+            background-color: rgba(220, 53, 69, 0.2);
+            border-left: 5px solid #dc3545;
+        }
+        .medium-impact {
+            background-color: rgba(255, 193, 7, 0.2);
+            border-left: 5px solid #ffc107;
+        }
+        .low-impact {
+            background-color: rgba(40, 167, 69, 0.2);
+            border-left: 5px solid #28a745;
+        }
+        .financial-metric {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+        .financial-value {
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        .positive {
+            color: #28a745;
+        }
+        .negative {
+            color: #dc3545;
+        }
+        .neutral {
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body data-bs-spy="scroll" data-bs-target="#navbar-example">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="navbar-example">
+        <div class="container">
+            <a class="navbar-brand" href="#">Stock Analysis</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle stock-selector" href="#" id="stockDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Select Stock
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="stockDropdown">
+                            <li><a class="dropdown-item" href="index.html">NVIDIA (NVDA)</a></li>
+                            <li><a class="dropdown-item" href="googl.html">Alphabet (GOOGL)</a></li>
+                            <li><a class="dropdown-item" href="mu.html">Micron Technology (MU)</a></li>
+                            <li><a class="dropdown-item" href="amzn.html">Amazon (AMZN)</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#summary">Summary</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#company">Company</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#financials">Financials</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#technical">Technical</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#competitors">Competitors</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#valuation">Valuation</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#tariffs">Tariffs</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#thesis">Thesis</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Back to Top Button -->
+    <button id="back-to-top" title="Back to Top"><i class="bi bi-arrow-up"></i></button>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        <!-- Executive Summary Section -->
+        <section id="summary" class="mb-5">
+            <h2 class="section-title">Executive Summary</h2>
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header">Investment Recommendation</div>
+                        <div class="card-body">
+                            <p class="lead">NVIDIA Corporation (NVDA) presents a <span class="highlight">compelling investment opportunity</span> with significant upside potential despite recent price weakness and tariff concerns.</p>
+                            <p>Our analysis indicates a substantial disconnect between the current market price (<span class="highlight">$101.80</span>) and our estimated fair value (<span class="highlight">$188.94</span>), suggesting <span class="highlight">85.60% potential upside</span> for investors with appropriate risk tolerance and time horizon.</p>
+                            
+                            <h5 class="mt-4">Recommendations by Investor Type:</h5>
+                            <div class="recommendation strong-buy">Growth Investors: Strong Buy</div>
+                            <div class="recommendation hold">Value Investors: Hold/Accumulate on Weakness</div>
+                            <div class="recommendation avoid">Income Investors: Avoid/Underweight</div>
+                            <div class="recommendation buy">Balanced Investors: Buy</div>
+                            <div class="recommendation strong-buy">Speculative Investors: Strong Buy with Options Strategy</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">Price Targets</div>
+                        <div class="card-body">
+                            <div class="price-target bull-case">
+                                <h5>Bull Case: $250-300</h5>
+                                <p>145-195% upside</p>
+                                <small>Assumes accelerated AI adoption, tariff exceptions, and maintained competitive advantage</small>
+                            </div>
+                            <div class="price-target base-case">
+                                <h5>Base Case: $175-225</h5>
+                                <p>72-121% upside</p>
+                                <small>Assumes steady AI growth, partial tariff impact, and maintained leadership position</small>
+                            </div>
+                            <div class="price-target bear-case">
+                                <h5>Bear Case: $70-90</h5>
+                                <p>12-31% downside</p>
+                                <small>Assumes AI investment slowdown, full tariff impact, and competitive market share losses</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">Key Findings</div>
+                        <div class="card-body">
+                            <h5>Business Strengths</h5>
+                            <p>NVIDIA dominates the AI chip market with 80-90% market share and has created significant competitive moats through its CUDA ecosystem, software stack, and first-mover advantage.</p>
+                            
+                            <h5>Financial Performance</h5>
+                            <p>NVIDIA has demonstrated exceptional financial performance with revenue growth of 77.94% year-over-year. The company maintains strong profitability with gross margins of 72.73% and operating margins of 53.81%.</p>
+                            
+                            <h5>Valuation Assessment</h5>
+                            <p>Our comprehensive valuation analysis using multiple methodologies indicates NVIDIA is significantly undervalued at current prices.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">Key Risks</div>
+                        <div class="card-body">
+                            <ol>
+                                <li><strong>Supply Chain Vulnerabilities:</strong> Heavy reliance on TSMC and exposure to high-tariff countries</li>
+                                <li><strong>Increasing Competition:</strong> AMD, Intel, and various startups investing heavily in AI chips</li>
+                                <li><strong>Customer Vertical Integration:</strong> Major customers developing custom AI chips</li>
+                                <li><strong>Valuation Concerns:</strong> Premium multiples create vulnerability to sentiment shifts</li>
+                                <li><strong>AI Demand Plateau:</strong> Potential for AI investment to slow if ROI doesn't materialize</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">Investor Recommendations</div>
+                        <div class="card-body text-center">
+                            <img src="charts/investor_recommendations.png" class="chart-img" alt="Investor Recommendations" data-bs-toggle="modal" data-bs-target="#chartModal" data-img="charts/investor_recommendations.png">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Company Overview Section -->
+        <section id="company" class="mb-5">
+            <h2 class="section-title">Company Overview</h2>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">Company Profile</div>
+                        <div class="card-body">
+                            <table class="table table-striped">
+                                <tbody>
+                                    <tr>
+                                        <th>Company Name</th>
+                                        <td>NVIDIA Corporation</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Symbol</th>
+                                        <td>NVDA</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Industry</th>
+                                        <td>Semiconductors</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Sector</th>
+                                        <td>Technology</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Employees</th>
+                                        <td>36,000</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Headquarters</th>
+                                        <td>Santa Clara, California, USA</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Website</th>
+                                        <td><a href="https://www.nvidia.com" target="_blank">www.nvidia.com</a></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">Business Summary</div>
+                        <div class="card-body">
+                            <p>NVIDIA Corporation is a leading technology company that designs graphics processing units (GPUs) for the gaming and professional markets, as well as system on a chip units (SoCs) for the mobile computing and automotive markets.</p>
+                            <p>The company has transformed from a graphics chip manufacturer to a leader in artificial intelligence (AI) computing. NVIDIA's GPUs are widely used in deep learning, cloud computing, and advanced analytics applications.</p>
+                            <p>Key business segments include:</p>
+                            <ul>
+                                <li><strong>Data Center:</strong> AI and high-performance computing solutions</li>
+                                <li><strong>Gaming:</strong> GeForce GPUs for PC gaming</li>
+                                <li><strong>Professional Visualization:</strong> Quadro/RTX GPUs for designers and creators</li>
+                                <li><strong>Automotive:</strong> Solutions for autonomous vehicles and infotainment systems</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">Competitive Advantages</div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="card mb-3">
+                                        <div class="card-body">
+                                            <h5 class="card-title"><i class="bi bi-lightning-charge-fill text-warning"></i> CUDA Ecosystem</h5>
+                                            <p class="card-text">Proprietary parallel computing platform and API model that enables developers to use NVIDIA GPUs for general purpose processing, creating significant switching costs.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card mb-3">
+                                        <div class="card-body">
+                                            <h5 class="card-title"><i class="bi bi-graph-up-arrow text-success"></i> First-Mover Advantage</h5>
+                                            <p class="card-text">Early focus on AI acceleration has allowed NVIDIA to build relationships with key customers and shape industry standards.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card mb-3">
+                                        <div class="card-body">
+                                            <h5 class="card-title"><i class="bi bi-code-square text-primary"></i> Software Stack</h5>
+                                            <p class="card-text">Comprehensive software offerings including CUDA, cuDNN, TensorRT, and other tools that make development easier on their platform.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Financial Analysis Section -->
+        <section id="financials" class="mb-5">
+            <h2 class="section-title">Financial Analysis</h2>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">Key Financial Metrics</div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="financial-metric">Revenue Growth (YoY)</div>
+                                    <div class="financial-value positive">77.94%</div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="financial-metric">Gross Margin</div>
+                                    <div class="financial-value positive">72.73%</div>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="financial-metric">Operating Margin</div>
+                                    <div class="financial-value positive">53.81%</div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="financial-metric">Net Profit Margin</div>
+                                    <div class="financial-value positive">42.00%</div>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="financial-metric">Return on Equity</div>
+                                    <div class="financial-value positive">30.42%</div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="financial-metric">Debt-to-Equity</div>
+                                    <div class="financial-value positive">0.13</div>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="financial-metric">Current Ratio</div>
+                                    <div class="financial-value neutral">3.43</div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="financial-metric">P/E Ratio</div>
+                                    <div class="financial-value neutral">41.30</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">Revenue Growth Comparison</div>
+                        <div class="card-body text-center">
+                            <img src="charts/revenue_growth_comparison.png" class="chart-img" alt="Revenue Growth Comparison" data-bs-toggle="modal" data-bs-target="#chartModal" data-img="charts/revenue_growth_comparison.png">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">Return on Equity Comparison</div>
+                        <div class="card-body text-center">
+                            <img src="charts/roe_comparison.png" class="chart-img" alt="ROE Comparison" data-bs-toggle="modal" data-bs-target="#chartModal" data-img="charts/roe_comparison.png">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">P/E Ratio Comparison</div>
+                        <div class="card-body text-center">
+                            <img src="charts/pe_ratio_comparison.png" class="chart-img" alt="P/E Ratio Comparison" data-bs-toggle="modal" data-bs-target="#chartModal" data-img="charts/pe_ratio_comparison.png">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">Market Sentiment</div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h5>Analyst Recommendations</h5>
+                                    <div class="progress mb-3" style="height: 25px;">
+                                        <div class="progress-bar bg-success" role="progressbar" style="width: 65%;" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100">Strong Buy (65%)</div>
+                                    </div>
+                                    <div class="progress mb-3" style="height: 25px;">
+                                        <div class="progress-bar bg-info" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">Buy (25%)</div>
+                                    </div>
+                                    <div class="progress mb-3" style="height: 25px;">
+                                        <div class="progress-bar bg-warning" role="progressbar" style="width: 10%;" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100">Hold (10%)</div>
+                                    </div>
+                                    <div class="progress mb-3" style="height: 25px;">
+                                        <div class="progress-bar bg-danger" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">Sell (0%)</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <h5>Insider Trading Activity</h5>
+                                    <p>Recent insider transactions show a mixed pattern with some selling activity, which is common for executives with stock-based compensation. No significant buying activity has been observed in the past quarter.</p>
+                                    <p>Key points:</p>
+                                    <ul>
+                                        <li>CEO Jensen Huang has maintained the majority of his holdings</li>
+                                        <li>CFO and other executives have executed planned sales</li>
+                                        <li>No unusual patterns that would indicate concerns about future performance</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Technical Analysis Section -->
+        <section id="technical" class="mb-5">
+            <h2 class="section-title">Technical Analysis</h2>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">Price and Moving Averages</div>
+                        <div class="card-body text-center">
+                            <img src="charts/nvda_price_mas.png" class="chart-img" alt="Price and Moving Averages" data-bs-toggle="modal" data-bs-target="#chartModal" data-img="charts/nvda_price_mas.png">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">Bollinger Bands</div>
+                        <div class="card-body text-center">
+                            <img src="charts/nvda_bollinger_bands.png" class="chart-img" alt="Bollinger Bands" data-bs-toggle="modal" data-bs-target="#chartModal" data-img="charts/nvda_bollinger_bands.png">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">MACD</div>
+                        <div class="card-body text-center">
+                            <img src="charts/nvda_macd.png" class="chart-img" alt="MACD" data-bs-toggle="modal" data-bs-target="#chartModal" data-img="charts/nvda_macd.png">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">RSI</div>
+                        <div class="card-body text-center">
+                            <img src="charts/nvda_rsi.png" class="chart-img" alt="RSI" data-bs-toggle="modal" data-bs-target="#chartModal" data-img="charts/nvda_rsi.png">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">Volume</div>
+                        <div class="card-body text-center">
+                            <img src="charts/nvda_volume.png" class="chart-img" alt="Volume" data-bs-toggle="modal" data-bs-target="#chartModal" data-img="charts/nvda_volume.png">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">Support and Resistance</div>
+                        <div class="card-body text-center">
+                            <img src="charts/nvda_support_resistance.png" class="chart-img" alt="Support and Resistance" data-bs-toggle="modal" data-bs-target="#chartModal" data-img="charts/nvda_support_resistance.png">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">Technical Outlook</div>
+                        <div class="card-body">
+                            <p>Current technical indicators show NVIDIA in a downtrend with bearish MACD signals, but also displaying oversold conditions according to RSI (23.56) and Bollinger Bands positioning. This suggests potential for a technical bounce in the near term, though the primary trend remains bearish.</p>
+                            
+                            <div class="row mt-3">
+                                <div class="col-md-6">
+                                    <h5>Key Support Levels</h5>
+                                    <ul>
+                                        <li><strong>$109.70:</strong> Recent low, critical support</li>
+                                        <li><strong>$95.00:</strong> Psychological support</li>
+                                        <li><strong>$88.30:</strong> Previous consolidation area</li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <h5>Key Resistance Levels</h5>
+                                    <ul>
+                                        <li><strong>$133.00:</strong> Recent high, immediate resistance</li>
+                                        <li><strong>$150.00:</strong> Psychological resistance</li>
+                                        <li><strong>$165.70:</strong> Previous support, now resistance</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Competitor Comparison Section -->
+        <section id="competitors" class="mb-5">
+            <h2 class="section-title">Competitor Comparison</h2>
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">Key Competitors</div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Company</th>
+                                            <th>Primary Business</th>
+                                            <th>AI Focus</th>
+                                            <th>Key Competitive Advantages</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>NVIDIA Corporation</td>
+                                            <td>GPUs, AI chips, data center solutions</td>
+                                            <td>High - Core business</td>
+                                            <td>AI leadership, CUDA ecosystem, first-mover advantage in AI GPUs</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Advanced Micro Devices</td>
+                                            <td>CPUs, GPUs, data center chips</td>
+                                            <td>Medium-High - Growing focus</td>
+                                            <td>CPU performance, MI300 AI accelerators, competitive pricing</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Intel Corporation</td>
+                                            <td>CPUs, foundry services, data center chips</td>
+                                            <td>Medium - Growing focus</td>
+                                            <td>Manufacturing capabilities, x86 ecosystem, Gaudi AI accelerators</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Taiwan Semiconductor Manufacturing</td>
+                                            <td>Semiconductor manufacturing (foundry)</td>
+                                            <td>Medium - Enabling technology</td>
+                                            <td>Advanced manufacturing processes, scale, customer relationships</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Broadcom Inc.</td>
+                                            <td>Networking, broadband, wireless, storage solutions</td>
+                                            <td>Medium - Growing focus</td>
+                                            <td>Diversified portfolio, networking expertise, VMware acquisition</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">Market Share Analysis</div>
+                        <div class="card-body">
+                            <h5>GPU Market Share</h5>
+                            <div class="progress mb-3" style="height: 30px;">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: 80%;" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100">NVIDIA (80%)</div>
+                                <div class="progress-bar bg-warning" role="progressbar" style="width: 19%;" aria-valuenow="19" aria-valuemin="0" aria-valuemax="100">AMD (19%)</div>
+                                <div class="progress-bar bg-danger" role="progressbar" style="width: 1%;" aria-valuenow="1" aria-valuemin="0" aria-valuemax="100">Others (1%)</div>
+                            </div>
+                            
+                            <h5 class="mt-4">AI Accelerator Market Share</h5>
+                            <div class="progress mb-3" style="height: 30px;">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: 85%;" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100">NVIDIA (85%)</div>
+                                <div class="progress-bar bg-warning" role="progressbar" style="width: 8%;" aria-valuenow="8" aria-valuemin="0" aria-valuemax="100">AMD (8%)</div>
+                                <div class="progress-bar bg-info" role="progressbar" style="width: 5%;" aria-valuenow="5" aria-valuemin="0" aria-valuemax="100">Intel (5%)</div>
+                                <div class="progress-bar bg-danger" role="progressbar" style="width: 2%;" aria-valuenow="2" aria-valuemin="0" aria-valuemax="100">Others (2%)</div>
+                            </div>
+                            
+                            <p class="mt-3">NVIDIA dominates the discrete GPU market with approximately 80% market share, while AMD holds most of the remaining 20%. In the AI accelerator market, NVIDIA is the clear leader with an estimated 80-90% share of the data center AI chip market.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">Competitive Challenges</div>
+                        <div class="card-body">
+                            <ol>
+                                <li><strong>Increasing Competition:</strong> AMD, Intel, and various startups are investing heavily in AI chips, potentially eroding NVIDIA's market dominance over time.</li>
+                                <li><strong>Pricing Pressure:</strong> Competitors are offering lower-priced alternatives, which could pressure NVIDIA's margins.</li>
+                                <li><strong>Customer Diversification:</strong> Major customers like Google, Microsoft, and Meta are developing their own custom AI chips to reduce dependence on NVIDIA.</li>
+                                <li><strong>Regulatory Scrutiny:</strong> NVIDIA's dominant position may attract antitrust scrutiny in the future.</li>
+                                <li><strong>Supply Chain Vulnerabilities:</strong> Heavy reliance on TSMC for manufacturing creates potential supply chain risks.</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Valuation Analysis Section -->
+        <section id="valuation" class="mb-5">
+            <h2 class="section-title">Intrinsic Value Analysis</h2>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">Valuation Summary</div>
+                        <div class="card-body">
+                            <div class="text-center mb-4">
+                                <h3>Current Price: <span class="highlight">$101.80</span></h3>
+                                <h3>Fair Value Estimate: <span class="highlight">$188.94</span></h3>
+                                <h3>Potential Return: <span class="highlight">85.60%</span></h3>
+                                <div class="alert alert-success mt-3">
+                                    <strong>Valuation Assessment:</strong> Significantly Undervalued
+                                </div>
+                            </div>
+                            
+                            <div class="text-center">
+                                <img src="charts/valuation_comparison.png" class="chart-img" alt="Valuation Comparison" data-bs-toggle="modal" data-bs-target="#chartModal" data-img="charts/valuation_comparison.png">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">Valuation Methods</div>
+                        <div class="card-body">
+                            <div class="accordion" id="valuationAccordion">
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingDCF">
+                                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDCF" aria-expanded="true" aria-controls="collapseDCF">
+                                            Discounted Cash Flow (DCF)
+                                        </button>
+                                    </h2>
+                                    <div id="collapseDCF" class="accordion-collapse collapse show" aria-labelledby="headingDCF" data-bs-parent="#valuationAccordion">
+                                        <div class="accordion-body">
+                                            <p><strong>Fair Value Estimate:</strong> $222.60</p>
+                                            <p><strong>WACC:</strong> 12.79%</p>
+                                            <p><strong>Terminal Growth Rate:</strong> 3.00%</p>
+                                            <p><strong>Enterprise Value:</strong> $529.82 billion</p>
+                                            <p><strong>Equity Value:</strong> $549.82 billion</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingPE">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePE" aria-expanded="false" aria-controls="collapsePE">
+                                            P/E-Based Valuation
+                                        </button>
+                                    </h2>
+                                    <div id="collapsePE" class="accordion-collapse collapse" aria-labelledby="headingPE" data-bs-parent="#valuationAccordion">
+                                        <div class="accordion-body">
+                                            <p><strong>Current P/E Ratio:</strong> 41.30</p>
+                                            <p><strong>Industry Average P/E:</strong> 30.00</p>
+                                            <p><strong>Projected EPS (5 Years):</strong> $7.51</p>
+                                            <p><strong>Fair P/E Ratio (PEG-Based):</strong> 37.50</p>
+                                            <p><strong>Fair Value Estimate (PEG-Based):</strong> $281.52</p>
+                                            <p><strong>Fair Value Estimate (Industry P/E):</strong> $225.22</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingComparable">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseComparable" aria-expanded="false" aria-controls="collapseComparable">
+                                            Comparable Company Valuation
+                                        </button>
+                                    </h2>
+                                    <div id="collapseComparable" class="accordion-collapse collapse" aria-labelledby="headingComparable" data-bs-parent="#valuationAccordion">
+                                        <div class="accordion-body">
+                                            <p><strong>Peer Average P/E Ratio:</strong> 53.39</p>
+                                            <p><strong>Peer Average P/S Ratio:</strong> 10.04</p>
+                                            <p><strong>P/E Premium to Peers:</strong> -22.65%</p>
+                                            <p><strong>Fair Value Estimate (Peer P/E):</strong> $131.35</p>
+                                            <p><strong>Fair Value Estimate (Peer P/S):</strong> $247.71</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">Projected EPS Growth</div>
+                        <div class="card-body text-center">
+                            <img src="charts/projected_eps_growth.png" class="chart-img" alt="Projected EPS Growth" data-bs-toggle="modal" data-bs-target="#chartModal" data-img="charts/projected_eps_growth.png">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">Projected Free Cash Flow</div>
+                        <div class="card-body text-center">
+                            <img src="charts/projected_fcf_growth.png" class="chart-img" alt="Projected FCF Growth" data-bs-toggle="modal" data-bs-target="#chartModal" data-img="charts/projected_fcf_growth.png">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tariff Sensitivity Section -->
+        <section id="tariffs" class="mb-5">
+            <h2 class="section-title">Tariff Sensitivity Analysis</h2>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">Tariff Rates by Country</div>
+                        <div class="card-body text-center">
+                            <img src="charts/tariff_rates.png" class="chart-img" alt="Tariff Rates by Country" data-bs-toggle="modal" data-bs-target="#chartModal" data-img="charts/tariff_rates.png">
+                            
+                            <div class="mt-4">
+                                <p>The new tariff structure includes:</p>
+                                <ul class="list-group">
+                                    <li class="list-group-item">A 10% baseline tariff on all imports</li>
+                                    <li class="list-group-item">54% on imports from China</li>
+                                    <li class="list-group-item">32% on imports from Taiwan</li>
+                                    <li class="list-group-item">46% on imports from Vietnam</li>
+                                    <li class="list-group-item">36% on imports from Thailand</li>
+                                    <li class="list-group-item">22% on imports from South Korea</li>
+                                    <li class="list-group-item">25% on imports from Japan</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">Supply Chain Exposure</div>
+                        <div class="card-body text-center">
+                            <img src="charts/tariff_exposure.png" class="chart-img" alt="Supply Chain Tariff Exposure" data-bs-toggle="modal" data-bs-target="#chartModal" data-img="charts/tariff_exposure.png">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">Key Components and Exposure Levels</div>
+                        <div class="card-body">
+                            <div class="tariff-impact high-impact">
+                                <h5>Semiconductor Manufacturing</h5>
+                                <p><strong>Description:</strong> NVIDIA designs chips but relies on TSMC (Taiwan) for manufacturing</p>
+                                <p><strong>Tariff Exposure:</strong> High - Taiwan faces 32% tariff rate</p>
+                                <p><strong>Impact Level:</strong> Medium - Semiconductors may have some exceptions</p>
+                                <p><strong>Mitigation Strategies:</strong> Potential shift to other manufacturing partners, pass costs to customers</p>
+                            </div>
+                            
+                            <div class="tariff-impact high-impact">
+                                <h5>Server Assembly</h5>
+                                <p><strong>Description:</strong> AI servers using NVIDIA GPUs are often assembled in China, Taiwan, and Vietnam</p>
+                                <p><strong>Tariff Exposure:</strong> High - China (54%), Taiwan (32%), Vietnam (46%)</p>
+                                <p><strong>Impact Level:</strong> High - Direct impact on cost of AI servers</p>
+                                <p><strong>Mitigation Strategies:</strong> Shift assembly to other countries, US manufacturing</p>
+                            </div>
+                            
+                            <div class="tariff-impact medium-impact">
+                                <h5>Memory Components</h5>
+                                <p><strong>Description:</strong> NVIDIA GPUs use memory chips from suppliers like Micron, Samsung, and SK Hynix</p>
+                                <p><strong>Tariff Exposure:</strong> Medium - Some components from South Korea and other affected countries</p>
+                                <p><strong>Impact Level:</strong> Medium - Could increase component costs</p>
+                                <p><strong>Mitigation Strategies:</strong> Multiple supplier relationships, inventory management</p>
+                            </div>
+                            
+                            <div class="tariff-impact medium-impact">
+                                <h5>Cooling Solutions</h5>
+                                <p><strong>Description:</strong> Thermal management components often manufactured in Asia</p>
+                                <p><strong>Tariff Exposure:</strong> Medium - Various Asian manufacturing locations</p>
+                                <p><strong>Impact Level:</strong> Low - Relatively small portion of overall costs</p>
+                                <p><strong>Mitigation Strategies:</strong> Redesign for local sourcing, alternative materials</p>
+                            </div>
+                            
+                            <div class="tariff-impact low-impact">
+                                <h5>Packaging Materials</h5>
+                                <p><strong>Description:</strong> Packaging and shipping materials often sourced globally</p>
+                                <p><strong>Tariff Exposure:</strong> Low - Diverse sourcing options</p>
+                                <p><strong>Impact Level:</strong> Low - Minimal impact on overall costs</p>
+                                <p><strong>Mitigation Strategies:</strong> Local sourcing alternatives</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">Conflicting Information on Semiconductor Exceptions</div>
+                        <div class="card-body">
+                            <div class="alert alert-success">
+                                <h5>Exception View</h5>
+                                <p>According to Altimeter Capital CEO Brad Gerstner, "semiconductors are on the list of exceptions, which [is] a 'wise exception' due to the importance of AI." This would significantly reduce NVIDIA's direct exposure.</p>
+                            </div>
+                            
+                            <div class="alert alert-danger">
+                                <h5>No Exception View</h5>
+                                <p>Other reports indicate no specific exception for semiconductors, with NVIDIA stock dropping over 7.5% following the tariff announcement, suggesting investors believe there will be material impact.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">Mitigation Strategies</div>
+                        <div class="card-body">
+                            <ol>
+                                <li><strong>Price Adjustments:</strong> NVIDIA may pass some or all of the increased costs to customers, leveraging its strong market position and the high demand for AI chips.</li>
+                                <li><strong>Supply Chain Diversification:</strong> Accelerate efforts to diversify manufacturing and assembly across different countries to reduce concentration risk.</li>
+                                <li><strong>Inventory Management:</strong> Strategic inventory positioning ahead of tariff implementation could provide a buffer period for adaptation.</li>
+                                <li><strong>Long-term Manufacturing Shifts:</strong> Potential investment in US-based manufacturing capabilities, possibly in partnership with contract manufacturers.</li>
+                                <li><strong>Product Redesign:</strong> Modifying products to reduce reliance on components from high-tariff countries.</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Investment Thesis Section -->
+        <section id="thesis" class="mb-5">
+            <h2 class="section-title">Investment Thesis</h2>
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">SWOT Analysis</div>
+                        <div class="card-body text-center">
+                            <img src="charts/swot_analysis.png" class="chart-img" alt="SWOT Analysis" data-bs-toggle="modal" data-bs-target="#chartModal" data-img="charts/swot_analysis.png">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-header strengths-header text-white">Strengths</div>
+                        <div class="card-body">
+                            <ol>
+                                <li><strong>AI Market Leadership:</strong> NVIDIA dominates the AI chip market with 80-90% market share, creating significant competitive moat.</li>
+                                <li><strong>CUDA Ecosystem:</strong> Proprietary CUDA platform creates high switching costs as most AI frameworks are optimized for NVIDIA GPUs.</li>
+                                <li><strong>Strong Financial Performance:</strong> Exceptional revenue growth (77.94% YoY) and high profit margins demonstrate business strength.</li>
+                                <li><strong>R&D Investment:</strong> Substantial investment in research and development maintains technological edge over competitors.</li>
+                                <li><strong>Vertical Integration:</strong> Integrated hardware and software approach optimizes performance and creates ecosystem lock-in.</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-header weaknesses-header text-white">Weaknesses</div>
+                        <div class="card-body">
+                            <ol>
+                                <li><strong>Supply Chain Vulnerabilities:</strong> Heavy reliance on TSMC (Taiwan) for manufacturing creates exposure to geopolitical risks and tariffs.</li>
+                                <li><strong>High Valuation Multiples:</strong> Trading at premium multiples (P/E: 41.3, P/S: 23.08) creates vulnerability to sentiment shifts.</li>
+                                <li><strong>Product Concentration Risk:</strong> Significant revenue concentration in AI and data center GPUs creates exposure if demand slows.</li>
+                                <li><strong>Limited Manufacturing Control:</strong> Fabless model means NVIDIA doesn't control its own manufacturing, creating dependency on partners.</li>
+                                <li><strong>Cyclical Business Exposure:</strong> Semiconductor industry historically experiences boom-bust cycles that could affect stability.</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-header opportunities-header text-white">Opportunities</div>
+                        <div class="card-body">
+                            <ol>
+                                <li><strong>AI Adoption Acceleration:</strong> Continued enterprise and consumer AI adoption creates sustained demand growth for NVIDIA products.</li>
+                                <li><strong>Data Center Expansion:</strong> Ongoing global data center buildout to support AI workloads drives demand for NVIDIA GPUs.</li>
+                                <li><strong>Automotive & Self-Driving:</strong> Growing automotive computing market represents significant growth vector beyond current core markets.</li>
+                                <li><strong>Omniverse & Digital Twins:</strong> Industrial metaverse applications create new market opportunities for simulation and digital twin technology.</li>
+                                <li><strong>Supply Chain Diversification:</strong> Opportunity to reduce geopolitical risk through manufacturing partnerships in multiple regions.</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-header threats-header">Threats</div>
+                        <div class="card-body">
+                            <ol>
+                                <li><strong>Increasing Competition:</strong> AMD, Intel, and various startups are investing heavily in AI chips, potentially eroding market dominance.</li>
+                                <li><strong>Customer Vertical Integration:</strong> Major customers (Google, Microsoft, Meta) developing custom AI chips to reduce NVIDIA dependence.</li>
+                                <li><strong>Tariff and Trade Tensions:</strong> New tariffs on imports from Taiwan, China, and other manufacturing hubs could impact costs and supply chain.</li>
+                                <li><strong>Regulatory Scrutiny:</strong> Dominant market position may attract antitrust scrutiny in the US and globally.</li>
+                                <li><strong>AI Demand Plateau:</strong> Potential for AI investment to slow if ROI doesn't materialize for enterprises at expected rates.</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">Investment Recommendations by Investor Type</div>
+                        <div class="card-body">
+                            <ul class="nav nav-tabs" id="investorTabs" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="growth-tab" data-bs-toggle="tab" data-bs-target="#growth" type="button" role="tab" aria-controls="growth" aria-selected="true">Growth</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="value-tab" data-bs-toggle="tab" data-bs-target="#value" type="button" role="tab" aria-controls="value" aria-selected="false">Value</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="income-tab" data-bs-toggle="tab" data-bs-target="#income" type="button" role="tab" aria-controls="income" aria-selected="false">Income</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="balanced-tab" data-bs-toggle="tab" data-bs-target="#balanced" type="button" role="tab" aria-controls="balanced" aria-selected="false">Balanced</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="speculative-tab" data-bs-toggle="tab" data-bs-target="#speculative" type="button" role="tab" aria-controls="speculative" aria-selected="false">Speculative</button>
+                                </li>
+                            </ul>
+                            <div class="tab-content" id="investorTabsContent">
+                                <div class="tab-pane fade show active" id="growth" role="tabpanel" aria-labelledby="growth-tab">
+                                    <div class="recommendation strong-buy mb-3">Strong Buy</div>
+                                    <p><strong>Profile:</strong> Seeks capital appreciation, higher risk tolerance, longer time horizon (5+ years)</p>
+                                    <p><strong>Rationale:</strong> NVIDIA's dominant position in AI chips, substantial growth runway, and technological leadership make it an ideal growth investment despite premium valuation. The company's 77.94% revenue growth and expanding addressable market in data centers, automotive, and industrial AI applications support long-term appreciation potential.</p>
+                                    <p><strong>Allocation Guidance:</strong> Consider 3-5% portfolio allocation for diversified investors, up to 8% for tech-focused portfolios</p>
+                                    <p><strong>Entry Strategy:</strong> Consider dollar-cost averaging given current technical weakness and tariff concerns</p>
+                                    <p><strong>Key Risks to Watch:</strong> Valuation compression, competition from AMD/Intel, customer vertical integration</p>
+                                </div>
+                                <div class="tab-pane fade" id="value" role="tabpanel" aria-labelledby="value-tab">
+                                    <div class="recommendation hold mb-3">Hold/Accumulate on Weakness</div>
+                                    <p><strong>Profile:</strong> Seeks undervalued companies with strong fundamentals, moderate risk tolerance, medium to long time horizon (3-5+ years)</p>
+                                    <p><strong>Rationale:</strong> While NVIDIA's current P/E ratio of 41.3 exceeds traditional value metrics, our intrinsic value analysis suggests significant undervaluation ($188.94 fair value vs. $101.80 current price) based on projected growth and cash flows. The recent price decline due to tariff concerns may provide entry opportunities for value investors willing to look beyond traditional metrics.</p>
+                                    <p><strong>Allocation Guidance:</strong> Consider 2-3% portfolio allocation, increasing on significant pullbacks</p>
+                                    <p><strong>Entry Strategy:</strong> Set price targets 10-15% below current levels for initial or additional positions</p>
+                                    <p><strong>Key Risks to Watch:</strong> Margin compression, growth deceleration, multiple contraction in rising rate environment</p>
+                                </div>
+                                <div class="tab-pane fade" id="income" role="tabpanel" aria-labelledby="income-tab">
+                                    <div class="recommendation avoid mb-3">Avoid/Underweight</div>
+                                    <p><strong>Profile:</strong> Seeks dividend income, lower risk tolerance, focus on capital preservation</p>
+                                    <p><strong>Rationale:</strong> NVIDIA does not currently pay a meaningful dividend, making it unsuitable for income-focused portfolios. The company prioritizes reinvesting cash flow into growth initiatives rather than returning capital to shareholders through dividends.</p>
+                                    <p><strong>Allocation Guidance:</strong> 0-1% allocation if seeking minimal exposure to semiconductor growth</p>
+                                    <p><strong>Entry Strategy:</strong> Not applicable for pure income strategy</p>
+                                    <p><strong>Key Risks to Watch:</strong> Opportunity cost in high-growth tech sector</p>
+                                </div>
+                                <div class="tab-pane fade" id="balanced" role="tabpanel" aria-labelledby="balanced-tab">
+                                    <div class="recommendation buy mb-3">Buy</div>
+                                    <p><strong>Profile:</strong> Seeks blend of growth and value, moderate risk tolerance, medium time horizon (3-5 years)</p>
+                                    <p><strong>Rationale:</strong> NVIDIA offers compelling long-term growth potential with recent price weakness providing a more attractive entry point. The company's strong competitive position, robust financial performance, and exposure to secular growth trends in AI make it suitable for balanced portfolios despite near-term tariff concerns.</p>
+                                    <p><strong>Allocation Guidance:</strong> Consider 2-4% portfolio allocation as part of technology sector exposure</p>
+                                    <p><strong>Entry Strategy:</strong> Phased entry approach, establishing initial position now with plans to add on further weakness</p>
+                                    <p><strong>Key Risks to Watch:</strong> Technical deterioration, margin compression, competitive threats</p>
+                                </div>
+                                <div class="tab-pane fade" id="speculative" role="tabpanel" aria-labelledby="speculative-tab">
+                                    <div class="recommendation strong-buy mb-3">Strong Buy with Options Strategy</div>
+                                    <p><strong>Profile:</strong> Seeks high-return opportunities, high risk tolerance, variable time horizon</p>
+                                    <p><strong>Rationale:</strong> NVIDIA's recent technical weakness combined with strong fundamentals and significant upside potential based on our intrinsic value analysis ($188.94 fair value) creates opportunities for speculative investors. The current bearish sentiment due to tariff concerns may be overblown given the company's pricing power and market dominance.</p>
+                                    <p><strong>Allocation Guidance:</strong> Consider 5-8% allocation for high-conviction speculative portion of portfolio</p>
+                                    <p><strong>Entry Strategy:</strong> Consider mix of common stock and LEAPS call options 12-18 months out to leverage potential recovery</p>
+                                    <p><strong>Key Risks to Watch:</strong> Continued technical deterioration, broader market correction, tariff implementation details</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">Conclusion</div>
+                        <div class="card-body">
+                            <p>NVIDIA represents a compelling investment opportunity for investors with appropriate risk tolerance and time horizon. The company's dominant position in AI chips, strong financial performance, and exposure to secular growth trends create a favorable long-term outlook despite near-term challenges from tariffs and technical weakness.</p>
+                            
+                            <p>The optimal approach varies by investor profile, with growth and speculative investors likely finding the most compelling opportunity in the current environment. Value and balanced investors may prefer a staged entry approach, while income investors should generally avoid or significantly underweight NVIDIA given its lack of meaningful dividend.</p>
+                            
+                            <p>Our analysis suggests significant upside potential from current levels, with a base case price target of $175-225 representing 72-121% upside over the next 12-18 months. However, investors must carefully consider their risk tolerance, time horizon, and portfolio construction when determining the appropriate allocation to NVIDIA.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>NVIDIA (NVDA) Stock Analysis</h5>
+                    <p>Comprehensive analysis of NVIDIA Corporation stock including company overview, financial data, market sentiment, technical analysis, competitor comparison, intrinsic value assessment, tariff sensitivity, and investment thesis.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p>Analysis Date: April 4, 2025</p>
+                    <p>This analysis is for informational purposes only and does not constitute investment advice.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Chart Modal -->
+    <div class="modal fade" id="chartModal" tabindex="-1" aria-labelledby="chartModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <button type="button" class="btn-close close-modal" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <img src="" class="img-fluid" id="modalImage">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Back to top button
+        window.onscroll = function() {scrollFunction()};
+        
+        function scrollFunction() {
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                document.getElementById("back-to-top").style.display = "block";
+            } else {
+                document.getElementById("back-to-top").style.display = "none";
+            }
+        }
+        
+        document.getElementById("back-to-top").addEventListener("click", function() {
+            document.body.scrollTop = 0; // For Safari
+            document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+        });
+        
+        // Chart modal
+        document.addEventListener('DOMContentLoaded', function() {
+            const chartModal = document.getElementById('chartModal');
+            const modalImage = document.getElementById('modalImage');
+            
+            chartModal.addEventListener('show.bs.modal', function(event) {
+                const button = event.relatedTarget;
+                const imgSrc = button.getAttribute('data-img');
+                modalImage.src = imgSrc;
+            });
+            
+            // Activate Bootstrap scrollspy
+            const scrollSpy = new bootstrap.ScrollSpy(document.body, {
+                target: '#navbar-example'
+            });
+            
+            // Highlight active nav item
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            window.addEventListener('scroll', function() {
+                let current = '';
+                
+                const sections = document.querySelectorAll('section');
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    const sectionHeight = section.clientHeight;
+                    if (pageYOffset >= (sectionTop - 100)) {
+                        current = section.getAttribute('id');
+                    }
+                });
+                
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').substring(1) === current) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
